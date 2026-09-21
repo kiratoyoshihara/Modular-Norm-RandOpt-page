@@ -1,7 +1,7 @@
 /* Compact, left-aligned section headings beneath a separate project masthead. */
 main { width: 90%; max-width: 1044px; margin-inline: auto; }
 .hero { padding-bottom: 56px; }
-.hero-subtitle { font-weight: 300; }
+.hero-subtitle { font-weight: 250; }
 .section .section-intro { max-width: none; margin: 0; text-align: left; }
 .section .section-intro .eyebrow { justify-content: flex-start; }
 .section .section-intro h2 { font-size: 24px; font-weight: 550; line-height: 1.35; letter-spacing: -.5px; margin-top: 0; }
