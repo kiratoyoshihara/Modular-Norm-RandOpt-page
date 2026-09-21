@@ -36,7 +36,7 @@ assert.equal(ties, 1);
 for (const [scaleId, scale] of Object.entries(data.scales)) {
   const ranges = taskRanges(data, scaleId);
   ranges.forEach((range, index) => {
-    assert.ok(range[1] > range[0] && range[0] >= 0 && range[1] <= 100);
+    assert.deepEqual(range, [0, 100], 'Every task and model size uses the same score scale');
     assert.equal(relativeValue(range[0], range), 0);
     assert.equal(relativeValue(range[1], range), 100);
     for (const method of data.methods) {
@@ -87,9 +87,9 @@ for (const compact of [false, true]) {
 }
 const html = await readFile(resolve(root, 'index.html'), 'utf8');
 assert.ok(html.includes(renderLegend(data)));
-for (const file of ['assets/js/main.js', 'assets/js/radar-chart.js', 'assets/js/radar-svg.js', 'assets/js/motion.js', 'assets/js/research-visuals.js', 'assets/js/research-experience.js']) {
+for (const file of ['assets/js/main.js', 'assets/js/radar-chart.js', 'assets/js/radar-svg.js', 'assets/js/method-animation.js', 'assets/js/method-svg.js', 'assets/js/motion.js', 'assets/js/research-visuals.js', 'assets/js/research-experience.js']) {
   const result = spawnSync(process.execPath, ['--check', resolve(root, file)], { encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr);
 }
 assert.ok(!html.includes('population-scaling.png'));
-console.log('Passed: scientific data, zoomed radar scales, missing-value gaps, static fallbacks, matching legend, and JS syntax.');
+console.log('Passed: scientific data, shared 0–100 radar scale, missing-value gaps, static fallbacks, matching legend, and JS syntax.');

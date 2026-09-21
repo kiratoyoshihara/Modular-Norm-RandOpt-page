@@ -8,7 +8,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const { JSDOM } = createRequire(resolve(root, '.local/verification/package.json'))('jsdom');
 const html = await readFile(resolve(root, 'index.html'), 'utf8');
 const originalFetch = globalThis.fetch;
-// Exercise the real entry point: chart motion must work without the Method UI.
+// Exercise the real entry point: the Overview method and charts initialize independently.
 for (const reducedOnLoad of [false, true]) {
   const dom = new JSDOM(html, { pretendToBeVisual: true, url: 'http://127.0.0.1:8000/' });
   globalThis.window = dom.window;
@@ -37,22 +37,27 @@ for (const reducedOnLoad of [false, true]) {
     assert.equal(requests.length, 1);
     assert.ok(requests[0].endsWith('/transfer-results.json'), 'Only the active chart data is loaded');
     assert.equal(document.querySelector('#method'), null);
+    const method = document.querySelector('#overview-method');
+    assert.equal(method.dataset.enhanced,'true');
+    assert.equal(method.querySelector('[data-method-replay]').disabled,reducedOnLoad);
     const rows = [...document.querySelectorAll('.figure2-row')];
     assert.equal(rows.length, 4, 'Both Figure 2 rows and iterative panels initialize');
     const radar = document.querySelector('#radar-mount');
     const charts = [...rows, radar];
-    const replay = [...document.querySelectorAll('[data-figure2-replay]')];
+    const replay = [...document.querySelectorAll('[data-figure2-replay], [data-radar-replay]')];
     assert.equal(document.documentElement.dataset.motion, reducedOnLoad ? 'paused' : 'running');
     charts.forEach(chart => assert.equal(chart.dataset.reveal, reducedOnLoad ? 'complete' : 'waiting'));
     replay.forEach(button => assert.equal(button.disabled, reducedOnLoad));
     if (!reducedOnLoad) {
       observers.forEach(observer => observer.emit(true));
-      charts.forEach(chart => assert.equal(chart.dataset.reveal, 'playing', 'Scroll reveal works without Method'));
+      charts.forEach(chart => assert.equal(chart.dataset.reveal, 'playing', 'Each chart responds to its own scroll observer'));
+      assert.equal(method.dataset.playing,'true');
       for (const hidden of [true, false]) {
         Object.defineProperty(document, 'hidden', { configurable: true, value: hidden });
         document.dispatchEvent(new window.Event('visibilitychange'));
         document.querySelectorAll('#figure2, #iterative-chart').forEach(chart => assert.equal(chart.dataset.paused, String(hidden)));
         assert.equal(radar.dataset.revealPaused, String(hidden));
+        assert.equal(method.dataset.playing,String(!hidden));
       }
     }
     preference.matches = true;
@@ -60,6 +65,8 @@ for (const reducedOnLoad of [false, true]) {
     assert.equal(document.documentElement.dataset.motion, 'paused');
     charts.forEach(chart => assert.equal(chart.dataset.reveal, 'complete'));
     replay.forEach(button => assert.equal(button.disabled, true));
+    assert.equal(method.dataset.playing,'false');
+    assert.equal(method.querySelector('[data-method-replay]').disabled,true);
     preference.matches = false;
     preference.dispatchEvent(new window.Event('change'));
     assert.equal(document.documentElement.dataset.motion, 'running');
@@ -71,4 +78,4 @@ for (const reducedOnLoad of [false, true]) {
     delete globalThis.document;
   }
 }
-console.log('Passed: real page initialization without Method, scroll reveals, visibility pause, reduced motion on load and preference changes.');
+console.log('Passed: independent Overview method and chart initialization, scroll reveals, visibility pause, reduced motion on load and preference changes.');

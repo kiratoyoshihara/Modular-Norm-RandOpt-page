@@ -9,7 +9,6 @@ const svg = renderFigure2(data);
 await writeFile(resolve(root, 'assets/figures/figure2.svg'), svg);
 const fragment = `<section class="section figure2-section" id="population-scaling" aria-labelledby="population-title">
   <div class="section-intro">
-    <p class="eyebrow">02 <span class="eyebrow-rule"></span> Population scaling</p>
     <h2 id="population-title">Stronger ensembles. From fewer candidates.</h2>
     <p class="figure2-model">Qwen2.5-1.5B-Instruct</p>
   </div>

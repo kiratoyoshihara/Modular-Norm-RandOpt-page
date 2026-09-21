@@ -19,43 +19,43 @@
     {
       "id": "countdown",
       "label": "Countdown",
-      "category": "Arithmetic",
+      "category": "Math",
       "metric": "Accuracy"
     },
     {
       "id": "gsm8k",
       "label": "GSM8K",
-      "category": "Mathematical reasoning",
+      "category": "Math",
       "metric": "Accuracy"
     },
     {
       "id": "mbpp",
       "label": "MBPP",
-      "category": "Code generation",
+      "category": "Programming",
       "metric": "Accuracy"
     },
     {
       "id": "rocstories",
       "label": "ROCStories",
-      "category": "Sentence ordering",
+      "category": "Writing",
       "metric": "Accuracy"
     },
     {
       "id": "uspto",
       "label": "USPTO-50K",
-      "category": "Reaction classification",
+      "category": "Chemistry",
       "metric": "Balanced accuracy"
     },
     {
       "id": "math500",
       "label": "MATH-500",
-      "category": "Mathematical reasoning",
+      "category": "Math",
       "metric": "Accuracy"
     },
     {
       "id": "olympiad",
       "label": "OlympiadBench",
-      "category": "Mathematical reasoning",
+      "category": "Math",
       "metric": "Accuracy"
     }
   ],

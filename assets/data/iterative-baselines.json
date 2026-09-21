@@ -6,28 +6,25 @@
     44
   ],
   "source": {
-    "primary": "Table 3(a), tab:iterative-es",
-    "fullPopulation": "Table D2, tab:es_full_endpoints",
-    "accounting": "Appendix D.2, eq:mn_total_eval_budget, eq:es_total_eval_budget, eq:zo_total_eval_budget"
-  },
-  "budget": {
-    "trainingPrompts": 200,
-    "iterativePerturbations": 3000,
-    "developmentEvaluations": 8000,
-    "includes": "Main-run search/training, checkpoint selection, and final test evaluation",
-    "excludes": "Preparation, hyperparameter selection, and unused intermediate ES test monitoring",
-    "unit": "model-prompt evaluations"
+    "primary": "User-supplied comparison results, 2026-09-21",
+    "previous": "Table 3(a), tab:iterative-es; Table D2, tab:es_full_endpoints"
   },
   "methods": [
     {
       "id": "modular",
-      "label": "MN RandOpt · K=25",
+      "label": "MN-RandOpt · K=25",
       "color": "#306FAD",
-      "marker": "circle"
+      "marker": "star"
+    },
+    {
+      "id": "randopt",
+      "label": "RandOpt · K=25",
+      "color": "#C76526",
+      "marker": "open-circle"
     },
     {
       "id": "es",
-      "label": "Iterative ES",
+      "label": "ES-at-Scale",
       "color": "#66866B",
       "marker": "diamond"
     },
@@ -40,14 +37,14 @@
     {
       "id": "mezo",
       "label": "MeZO",
-      "color": "#C76526",
+      "color": "#AE6262",
       "marker": "square"
     },
     {
       "id": "modular_single",
-      "label": "MN RandOpt · K=1",
+      "label": "MN-RandOpt · K=1",
       "color": "#91979E",
-      "marker": "open-circle"
+      "marker": "open-star"
     }
   ],
   "tasks": [
@@ -73,15 +70,6 @@
           "k": 25,
           "mean": 38.4,
           "sd": 2.71,
-          "source": "Table 3(a)"
-        },
-        {
-          "id": "mnmatched",
-          "method": "modular",
-          "n": 2820,
-          "k": 25,
-          "mean": 39.09,
-          "sd": 1.56,
           "source": "Table 3(a)"
         },
         {
@@ -116,9 +104,18 @@
           "method": "mezo",
           "n": 3000,
           "k": 1,
-          "mean": null,
-          "sd": null,
-          "source": "Table 3(a)"
+          "mean": 29.22,
+          "sd": 1.93,
+          "source": "User-supplied comparison results"
+        },
+        {
+          "id": "randopt3000",
+          "method": "randopt",
+          "n": 3000,
+          "k": 25,
+          "mean": 35.29,
+          "sd": 1.60,
+          "source": "User-supplied comparison results"
         },
         {
           "id": "mn_single",
@@ -156,15 +153,6 @@
           "source": "Table 3(a)"
         },
         {
-          "id": "mnmatched",
-          "method": "modular",
-          "n": 2841,
-          "k": 25,
-          "mean": 74.43,
-          "sd": 0.81,
-          "source": "Table 3(a)"
-        },
-        {
           "id": "mn3000",
           "method": "modular",
           "n": 3000,
@@ -196,9 +184,18 @@
           "method": "mezo",
           "n": 3000,
           "k": 1,
-          "mean": null,
-          "sd": null,
-          "source": "Table 3(a)"
+          "mean": 71.72,
+          "sd": 0.27,
+          "source": "User-supplied comparison results"
+        },
+        {
+          "id": "randopt3000",
+          "method": "randopt",
+          "n": 3000,
+          "k": 25,
+          "mean": 69.95,
+          "sd": 1.11,
+          "source": "User-supplied comparison results"
         },
         {
           "id": "mn_single",

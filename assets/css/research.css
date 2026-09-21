@@ -13,7 +13,8 @@ p { text-wrap: pretty; }
 .hero h1 { font-weight: 620; font-size: clamp(40px, 5.3vw, 65px); letter-spacing: -3.3px; margin-top: 23px; }
 .hero-subtitle { font-size: 21px; letter-spacing: -.65px; color: #505050; }
 .hero-authors { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 24px; margin-top: 24px; font-size: 15px; font-weight: 500; color: var(--ink); }
-.hero-authors span { white-space: nowrap; }
+.hero-authors a { white-space: nowrap; text-decoration: none; }
+.hero-authors a:hover, .hero-authors a:focus-visible { text-decoration: underline; }
 .hero-affiliation { margin-top: 6px; font-size: 13px; color: #919191; }
 .hero-description { font-size: 15px; line-height: 1.8; color: #757575; margin-top: 23px; }
 .hero-actions { margin-top: 26px; gap: 12px; }
@@ -500,11 +501,14 @@ html, body, main, .site-header, .hero, .section, .method-band, .results-section,
 .geometry-lab input[type='range'] { accent-color: #5d803f; }
 
 /* Radar: values on demand; point → stroke → fill on first viewport entry. */
+.radar-toolbar { max-width: 860px; margin: 6px auto 0; }
 .chart-legend button { color: var(--series-color); }
 .chart-legend button:disabled { cursor: default; opacity: 1; }
 .chart-legend button:hover, .chart-legend button[aria-pressed='true'] { background: #f7f7f7; border-color: #e8e8e8; }
 .chart-legend .legend-key { width: 30px; height: 16px; border: 0; }
 .radar-line-hit { cursor: pointer; }
+.radar-grid-hit { cursor: crosshair; }
+#radar-mount[data-guides-visible='true'] .radar-grid-line { stroke: #b8b8b8; }
 .radar-area { transition: fill-opacity 180ms ease; }
 .radar-outline { transition: stroke-width 180ms ease; }
 .radar-series[data-highlighted='true'] .radar-outline { stroke-width: 3.3; }
@@ -513,7 +517,6 @@ html, body, main, .site-header, .hero, .section, .method-band, .results-section,
 .tooltip-row > span::before { content: ''; display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--series-color); margin-right: 7px; vertical-align: 1px; }
 .tooltip-difference { display: flex; justify-content: space-between; gap: 15px; border-top: 1px solid #eee; padding-top: 9px; margin-top: 9px; color: #666; font-size: 10px; }
 .tooltip-difference strong { color: #222; font-weight: 500; }
-.tooltip-note { color: #777; font-size: 9px; margin-top: 7px; }
 #radar-mount[data-reveal='waiting'] .radar-point-dot,
 #radar-mount[data-reveal='waiting'] .radar-fill-layer { opacity: 0; }
 #radar-mount[data-reveal='waiting'] .radar-draw-mask { stroke-dashoffset: 1; }

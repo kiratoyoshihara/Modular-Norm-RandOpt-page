@@ -2,10 +2,11 @@ import { RadarChart } from './radar-chart.js';
 import { Figure2Chart } from './figure2-chart.js';
 import { SectionNav } from './section-nav.js';
 import { IterativeChart } from './iterative-chart.js';
+import { MethodAnimation } from './method-animation.js?v=indexed-colors-1';
 
 const sectionNav = document.querySelector('.section-nav');
 if (sectionNav) new SectionNav(sectionNav);
-// Chart motion is independent of the temporarily removed Method section.
+// Shared motion preference; each illustration controls its own playback.
 const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
 const syncMotionPreference = () => {
   const playing = !motionPreference.matches;
@@ -14,6 +15,17 @@ const syncMotionPreference = () => {
 };
 motionPreference.addEventListener('change', syncMotionPreference);
 syncMotionPreference();
+const method = document.querySelector('#overview-method');
+if (method) {
+  try { new MethodAnimation(method); }
+  catch (error) {
+    method.removeAttribute('data-enhanced');
+    method.removeAttribute('data-animate');
+    method.querySelector('.method-playback').hidden = true;
+    method.querySelector('.method-step-controls').hidden = true;
+    console.error('Using the static method illustration.', error);
+  }
+}
 const figure2 = document.querySelector('#figure2');
 if (figure2) {
   try { new Figure2Chart(figure2); }

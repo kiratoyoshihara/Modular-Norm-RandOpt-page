@@ -1,4 +1,4 @@
-import { DEFAULT_SCALE, escapeHTML, formatDifference, formatScore, renderRadar, taskRanges } from './radar-svg.js';
+import { DEFAULT_SCALE, escapeHTML, formatDifference, formatScore, renderRadar } from './radar-svg.js';
 
 export class RadarChart {
   constructor(root, data) {
@@ -13,11 +13,13 @@ export class RadarChart {
     this.stage = root.querySelector('#radar-stage');
     this.tooltip = root.querySelector('#radar-tooltip');
     this.panel = root.querySelector('#radar-panel');
+    this.replay = root.querySelector('[data-radar-replay]');
     this.tabs = [...root.querySelectorAll('[data-scale]')];
     this.legend = [...root.querySelectorAll('[data-method]')];
     this.mobile = window.matchMedia('(max-width: 620px)');
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    this.revealState = !this.reducedMotion.matches && document.documentElement.dataset.motion !== 'paused' && 'IntersectionObserver' in window ? 'waiting' : 'complete';
+    this.globalPaused = document.documentElement.dataset.motion === 'paused';
+    this.revealState = !this.reducedMotion.matches && !this.globalPaused && 'IntersectionObserver' in window ? 'waiting' : 'complete';
     this.mount.dataset.reveal = this.revealState;
     this.render();
     this.bindEvents();
@@ -40,6 +42,7 @@ export class RadarChart {
     });
     this.panel.setAttribute('aria-labelledby', selected.id);
     this.hideTooltip();
+    this.setGuidesVisible(false);
     this.updateTaskState();
     this.updateHighlight();
     if (focusedTask) this.mount.querySelector(`.radar-label[data-task="${focusedTask}"]`)?.focus();
@@ -83,9 +86,9 @@ export class RadarChart {
     const ours = scores.modular[this.task]?.mean;
     const baseline = scores.randopt[this.task]?.mean;
     const difference = ours == null || baseline == null ? null : ours - baseline;
-    const range = taskRanges(this.data, this.scale)[this.data.tasks.findIndex((entry) => entry.id === this.task)];
-    this.tooltip.innerHTML = `<p class="tooltip-title">${escapeHTML(task.label)} · ${escapeHTML(task.metric)} (%)</p>${this.data.methods.map((method) => `<div class="tooltip-row" style="--series-color:${method.color}"><span>${escapeHTML(method.shortName)}</span><strong>${formatScore(scores[method.id][this.task])}</strong></div>`).join('')}<p class="tooltip-difference">MN − RandOpt <strong>${formatDifference(difference)}</strong></p><p class="tooltip-note">Zoomed axis: ${range[0]}–${range[1]}% · Mean ± sample SD</p>`;
+    this.tooltip.innerHTML = `<p class="tooltip-title">${escapeHTML(task.label)} · ${escapeHTML(task.metric)} (%)</p>${this.data.methods.map((method) => `<div class="tooltip-row" style="--series-color:${method.color}"><span>${escapeHTML(method.shortName)}</span><strong>${formatScore(scores[method.id][this.task])}</strong></div>`).join('')}<p class="tooltip-difference">MN − RandOpt <strong>${formatDifference(difference)}</strong></p>`;
     this.tooltip.hidden = false;
+    this.setGuidesVisible(true);
     this.mount.querySelectorAll('.radar-label').forEach((label) => {
       if (label.dataset.task === this.task) label.setAttribute('aria-describedby', 'radar-tooltip');
       else label.removeAttribute('aria-describedby');
@@ -102,24 +105,55 @@ export class RadarChart {
     this.mount.querySelectorAll('[aria-describedby="radar-tooltip"]').forEach((label) => label.removeAttribute('aria-describedby'));
   }
 
+  setGuidesVisible(visible) {
+    this.mount.dataset.guidesVisible = String(visible);
+    this.mount.querySelector('.radar-guides')?.setAttribute('visibility', visible ? 'visible' : 'hidden');
+  }
+
   completeReveal() {
     this.revealState = 'complete';
     this.mount.dataset.reveal = 'complete';
-    this.revealObserver?.disconnect();
+  }
+
+  replayAnimation() {
+    if (this.reducedMotion.matches || this.globalPaused) return;
+    this.hideTooltip();
+    this.setGuidesVisible(false);
+    this.hoverMethod = null;
+    this.focusMethod = null;
+    this.updateHighlight();
+    this.revealState = 'waiting';
+    this.mount.dataset.reveal = 'waiting';
+    // Commit the reset before restarting the point → line → fill sequence.
+    this.mount.getBoundingClientRect();
+    if (!this.revealObserver || this.mount.dataset.revealVisible === 'true') {
+      this.revealState = 'playing';
+      this.mount.dataset.reveal = 'playing';
+    }
+  }
+
+  updateReplay() {
+    this.replay.disabled = this.reducedMotion.matches || this.globalPaused;
   }
 
   bindReveal() {
-    this.onMotionPreference = () => { if (this.reducedMotion.matches) this.completeReveal(); };
+    this.onMotionPreference = () => { if (this.reducedMotion.matches) this.completeReveal(); this.updateReplay(); };
     this.reducedMotion.addEventListener('change', this.onMotionPreference);
-    this.onGlobalMotion = (event) => { if (!event.detail.playing) this.completeReveal(); };
+    this.onGlobalMotion = (event) => {
+      this.globalPaused = !event.detail.playing;
+      if (this.globalPaused) this.completeReveal();
+      this.updateReplay();
+    };
     document.addEventListener('research-motion-change', this.onGlobalMotion);
     this.onVisibility = () => { this.mount.dataset.revealPaused = String(document.hidden); };
     document.addEventListener('visibilitychange', this.onVisibility);
     this.onVisibility();
-    this.mount.addEventListener('animationend', (event) => {
+    this.onRevealEnd = (event) => {
       if (event.animationName === 'radar-sequence' && event.target.classList.contains('radar-svg')) this.completeReveal();
-    });
-    if (this.revealState === 'complete') return;
+    };
+    this.mount.addEventListener('animationend', this.onRevealEnd);
+    this.updateReplay();
+    if (!('IntersectionObserver' in window)) return;
     this.revealObserver = new window.IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         const visible = entry.isIntersecting && entry.intersectionRatio >= .22;
@@ -134,6 +168,8 @@ export class RadarChart {
   }
 
   bindEvents() {
+    this.onReplay = () => this.replayAnimation();
+    this.replay.addEventListener('click', this.onReplay);
     this.onResize = () => {
       if (this.revealState === 'playing') this.completeReveal();
       this.render();
@@ -151,10 +187,10 @@ export class RadarChart {
       });
     });
     this.legend.forEach((button) => {
-      button.addEventListener('pointerenter', (event) => { if (event.pointerType !== 'touch') { this.completeReveal(); this.hoverMethod = button.dataset.method; this.updateHighlight(); } });
-      button.addEventListener('pointerleave', () => { this.hoverMethod = null; this.updateHighlight(); });
-      button.addEventListener('focus', () => { this.completeReveal(); this.focusMethod = button.dataset.method; this.updateHighlight(); });
-      button.addEventListener('blur', () => { this.focusMethod = null; this.updateHighlight(); });
+      button.addEventListener('pointerenter', (event) => { if (event.pointerType !== 'touch') { this.completeReveal(); this.hoverMethod = button.dataset.method; this.updateHighlight(); this.setGuidesVisible(true); } });
+      button.addEventListener('pointerleave', () => { this.hoverMethod = null; this.updateHighlight(); this.setGuidesVisible(false); });
+      button.addEventListener('focus', () => { this.completeReveal(); this.focusMethod = button.dataset.method; this.updateHighlight(); this.setGuidesVisible(true); });
+      button.addEventListener('blur', () => { this.focusMethod = null; this.updateHighlight(); this.setGuidesVisible(false); });
       button.addEventListener('click', () => {
         this.completeReveal();
         const method = button.dataset.method;
@@ -166,8 +202,10 @@ export class RadarChart {
       if (event.pointerType === 'touch') return;
       const target = event.target.closest('[data-task]');
       const series = event.target.closest('[data-series]');
-      if (!target && !series) return;
+      const grid = event.target.closest('.radar-grid');
+      if (!target && !series && !grid) return;
       this.completeReveal();
+      this.setGuidesVisible(true);
       this.hoverMethod = series?.dataset.series ?? null;
       this.updateHighlight();
       if (target) { this.chooseTask(target.dataset.task); this.showTooltip(event.clientX, event.clientY); }
@@ -181,6 +219,7 @@ export class RadarChart {
       const next = event.relatedTarget;
       const inside = next instanceof window.Element && this.mount.contains(next);
       this.hoverMethod = inside ? next.closest('[data-series]')?.dataset.series ?? null : null;
+      this.setGuidesVisible(Boolean(inside && next.closest('.radar-grid, [data-series], [data-task]')));
       if (!inside || !next.closest('[data-task]')) this.hideTooltip();
       this.updateHighlight();
     });
@@ -192,7 +231,7 @@ export class RadarChart {
       const bounds = target.getBoundingClientRect();
       this.showTooltip(bounds.left + bounds.width / 2, bounds.bottom);
     });
-    this.mount.addEventListener('focusout', () => this.hideTooltip());
+    this.mount.addEventListener('focusout', () => { this.hideTooltip(); this.setGuidesVisible(false); });
     this.mount.addEventListener('click', (event) => {
       const target = event.target.closest('[data-task]');
       if (target) {
@@ -202,11 +241,17 @@ export class RadarChart {
       }
       else if (event.target.closest('.radar-line-hit')) {
         this.completeReveal();
+        this.setGuidesVisible(true);
         const method = event.target.closest('[data-series]').dataset.series;
         this.pinnedMethod = this.pinnedMethod === method ? null : method;
         this.updateHighlight();
       }
-      else this.hideTooltip();
+      else {
+        this.hideTooltip();
+        const grid = event.target.closest('.radar-grid');
+        if (grid) this.completeReveal();
+        this.setGuidesVisible(Boolean(grid));
+      }
     });
     this.mount.addEventListener('keydown', (event) => {
       if (event.key !== 'Enter' && event.key !== ' ') return;
@@ -224,14 +269,17 @@ export class RadarChart {
       this.hoverMethod = null;
       this.focusMethod = null;
       this.hideTooltip();
+      this.setGuidesVisible(false);
       this.updateHighlight();
     });
-    this.onOutsidePointer = (event) => { if (!this.stage.contains(event.target)) this.hideTooltip(); };
+    this.onOutsidePointer = (event) => { if (!this.stage.contains(event.target)) { this.hideTooltip(); this.setGuidesVisible(false); } };
     document.addEventListener('pointerdown', this.onOutsidePointer);
   }
 
   destroy() {
     this.revealObserver?.disconnect();
+    this.replay.removeEventListener('click', this.onReplay);
+    this.mount.removeEventListener('animationend', this.onRevealEnd);
     this.mobile.removeEventListener('change', this.onResize);
     this.reducedMotion.removeEventListener('change', this.onMotionPreference);
     document.removeEventListener('visibilitychange', this.onVisibility);
