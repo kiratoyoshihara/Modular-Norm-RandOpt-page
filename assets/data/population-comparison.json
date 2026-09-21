@@ -1,0 +1,9 @@
+{
+  "model": "Qwen2.5-1.5B-Instruct",
+  "seeds": [42, 43, 44],
+  "source": {"texLabel": "tab:extended_k_comparison", "section": "Appendix C: Additional Experimental Results", "metric": "Mean accuracy difference in percentage points, Modular Norm RandOpt minus RandOpt"},
+  "tasks": {
+    "gsm8k": {"label": "GSM8K", "baselineN": 300, "modularN": 25, "reductionLabel": "≥12×", "differences": {"10": 2.60, "25": 3.11}},
+    "countdown": {"label": "Countdown", "baselineN": 300, "modularN": 100, "reductionLabel": "3×", "differences": {"10": 1.53, "25": 0.93}}
+  }
+}

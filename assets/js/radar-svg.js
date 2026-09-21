@@ -1,0 +1,116 @@
+export const DEFAULT_SCALE = '1.5B';
+
+export function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  })[character]);
+}
+
+export function radarLayout(compact = false) {
+  return compact
+    ? { width: 440, height: 355, cx: 220, cy: 170, radius: 111, labelRadius: 137, compact }
+    : { width: 860, height: 545, cx: 430, cy: 278, radius: 198, labelRadius: 247, compact };
+}
+
+export function taskRanges(data, scale) {
+  return data.tasks.map((task) => {
+    const values = data.methods.map((method) => data.scales[scale].scores[method.id][task.id]).filter((score) => score?.mean != null);
+    if (!values.length) return [0, 100];
+    const low = Math.min(...values.map((score) => score.mean - score.sd));
+    const high = Math.max(...values.map((score) => score.mean + score.sd));
+    const span = Math.max(high - low, .5);
+    const rawStep = span * 1.3 / 4;
+    const magnitude = 10 ** Math.floor(Math.log10(rawStep));
+    const step = [1, 2, 2.5, 5, 10].find((value) => value * magnitude >= rawStep) * magnitude;
+    const min = Math.max(0, Math.floor((low - span * .15) / step) * step);
+    const max = Math.min(100, Math.ceil((high + span * .15) / step) * step);
+    return [Number(min.toFixed(4)), Number(max.toFixed(4))];
+  });
+}
+
+export function relativeValue(value, range) {
+  return value === null ? null : (value - range[0]) / (range[1] - range[0]) * 100;
+}
+
+const rangeLabel = (range) => `${Number(range[0].toFixed(2))}–${Number(range[1].toFixed(2))}%`;
+
+export function radarPoint(index, value, count, layout) {
+  const angle = -Math.PI / 2 + index * Math.PI * 2 / count;
+  const radius = layout.radius * value / 100;
+  return [layout.cx + Math.cos(angle) * radius, layout.cy + Math.sin(angle) * radius];
+}
+
+// A missing measurement breaks the line; it is never plotted as zero.
+export function seriesGeometry(values, layout) {
+  const points = values.map((value, index) => value === null ? null : radarPoint(index, value, values.length, layout));
+  if (points.every(Boolean)) {
+    return { fill: points.map((point) => point.join(',')).join(' '), line: `M${points.map((point) => point.join(',')).join('L')}Z`, points };
+  }
+  const gap = points.findIndex((point) => point === null);
+  let line = '';
+  let connected = false;
+  for (let step = 1; step <= points.length; step += 1) {
+    const point = points[(gap + step) % points.length];
+    if (point) {
+      line += `${connected ? 'L' : 'M'}${point.join(',')}`;
+      connected = true;
+    } else connected = false;
+  }
+  return { fill: null, line, points };
+}
+
+export function formatScore(score) {
+  return score?.mean == null ? 'N/A' : `${score.mean.toFixed(2)} ± ${score.sd.toFixed(2)}`;
+}
+
+export function formatDifference(value) {
+  if (value === null) return 'N/A';
+  return `${value > 0 ? '+' : value < 0 ? '−' : ''}${Math.abs(value).toFixed(2)} pp`;
+}
+
+export function renderLegend(data) {
+  return data.methods.map((method) => `<button type="button" data-method="${escapeHTML(method.id)}" aria-pressed="false" disabled style="--series-color:${method.color}"><svg class="legend-key" viewBox="0 0 30 16" width="30" height="16" aria-hidden="true"><path d="M1 8H29" fill="none" stroke="currentColor" stroke-width="2" ${method.dash ? `stroke-dasharray="${method.dash}"` : ''}/><circle cx="15" cy="8" r="3.2" fill="${method.id === 'modular' ? 'currentColor' : '#fff'}" stroke="currentColor" stroke-width="1.6"/></svg>${escapeHTML(method.name)}${method.id === 'modular' ? '<span class="ours-tag">Ours</span>' : ''}</button>`).join('\n');
+}
+
+export function renderRadar(data, scale = DEFAULT_SCALE, { compact = false, interactive = false, id = 'radar' } = {}) {
+  const layout = radarLayout(compact);
+  const count = data.tasks.length;
+  const scores = data.scales[scale].scores;
+  const ranges = taskRanges(data, scale);
+  const pointString = (value) => data.tasks.map((_, index) => radarPoint(index, value, count, layout).join(',')).join(' ');
+  const grids = [20, 40, 60, 80, 100].map((level) => `<polygon points="${pointString(level)}" fill="none" stroke="#e2e2e2" stroke-width="1"/>`).join('');
+  const axes = data.tasks.map((_, index) => { const point = radarPoint(index, 100, count, layout); return `<path d="M${layout.cx},${layout.cy}L${point.join(',')}" stroke="#ececec" stroke-width="1"/>`; }).join('');
+  const series = [...data.methods].reverse().map((method) => {
+    const values = data.tasks.map((task, index) => relativeValue(scores[method.id][task.id]?.mean ?? null, ranges[index]));
+    const { fill, line, points } = seriesGeometry(values, layout);
+    const isOurs = method.id === 'modular';
+    const order = data.methods.findIndex((entry) => entry.id === method.id);
+    const mask = `${id}-draw-${method.id}`;
+    return `<g data-series="${escapeHTML(method.id)}" class="radar-series" style="color:${method.color};--series-delay:${order * 90}ms">
+      ${interactive ? `<defs><mask id="${mask}" maskUnits="userSpaceOnUse" x="0" y="0" width="${layout.width}" height="${layout.height}"><path class="radar-draw-mask" d="${line}" fill="none" stroke="white" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0"/></mask></defs>` : ''}
+      ${fill ? `<g class="radar-fill-layer"><polygon class="radar-area" points="${fill}" fill="currentColor" fill-opacity=".035" pointer-events="none"/></g>` : ''}
+      <path class="radar-outline" d="${line}" fill="none" stroke="currentColor" stroke-width="${isOurs ? '2.8' : '2'}" ${method.dash ? `stroke-dasharray="${method.dash}"` : ''} ${interactive ? `mask="url(#${mask})"` : ''} stroke-linejoin="round" pointer-events="none"/>
+      ${interactive ? `<path class="radar-line-hit" d="${line}" fill="none" stroke="transparent" stroke-width="14" pointer-events="stroke" aria-hidden="true"/>` : ''}
+      ${points.map((point, index) => point ? `<g data-task="${data.tasks[index].id}" ${interactive ? 'class="radar-point"' : ''} style="--point-delay:${index * 110 + order * 90}ms"><title>${escapeHTML(method.name)} · ${escapeHTML(data.tasks[index].label)}: ${formatScore(scores[method.id][data.tasks[index].id])}%</title>${interactive ? `<circle cx="${point[0]}" cy="${point[1]}" r="12" fill="transparent"/>` : ''}<circle class="radar-point-dot" cx="${point[0]}" cy="${point[1]}" r="${compact ? '3.6' : '4'}" fill="${isOurs ? method.color : '#fff'}" stroke="currentColor" stroke-width="1.6"/></g>` : '').join('')}
+    </g>`;
+  }).join('');
+  const labels = data.tasks.map((task, index) => {
+    const angle = -Math.PI / 2 + index * Math.PI * 2 / count;
+    const x = layout.cx + Math.cos(angle) * layout.labelRadius;
+    const y = layout.cy + Math.sin(angle) * layout.labelRadius - (index === 0 ? 10 : 0);
+    const anchor = Math.cos(angle) > .2 ? 'start' : Math.cos(angle) < -.2 ? 'end' : 'middle';
+    const lines = task.id === 'olympiad' ? ['Olympiad', 'Bench'] : [task.label];
+    const rangeText = rangeLabel(ranges[index]);
+    const delta = scores.modular[task.id]?.mean == null || scores.randopt[task.id]?.mean == null ? null : scores.modular[task.id].mean - scores.randopt[task.id].mean;
+    const labelWidth = Math.max(...lines.map((text) => text.length)) * (compact ? 9 : 9.1) + 16;
+    const rectX = anchor === 'start' ? -8 : anchor === 'end' ? -labelWidth + 8 : -labelWidth / 2;
+    const startY = lines.length > 1 ? -13 : -4;
+    return `<g transform="translate(${x},${y})" data-task="${task.id}" class="radar-label" ${interactive ? `role="button" tabindex="0" aria-label="Show ${escapeHTML(task.label)} scores, axis ${rangeText}, difference ${formatDifference(delta)}" aria-pressed="false"` : ''}><rect class="radar-label-hit" x="${rectX}" y="${startY - 18}" width="${labelWidth}" height="${lines.length > 1 ? 47 : 30}" rx="5" fill="transparent"/><text text-anchor="${anchor}" y="${startY}">${lines.map((line, lineIndex) => `<tspan x="0" dy="${lineIndex ? 18 : 0}">${escapeHTML(line)}</tspan>`).join('')}</text></g>`;
+  }).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${layout.width} ${layout.height}" ${interactive ? 'role="group"' : 'role="img"'} aria-labelledby="${id}-title ${id}-desc" class="radar-svg${compact ? ' radar-svg-compact' : ''}">
+    <title id="${id}-title">Performance across seven tasks · ${escapeHTML(data.scales[scale].label)}</title>
+    <desc id="${id}-desc">Three methods at N=100 and K=25. Each task has its own magnified range, available on hover, tap, or keyboard focus. Ranges change with model size; area is not an aggregate score. The tooltip gives the mean difference between Modular Norm RandOpt and RandOpt, in percentage points. Lines show means over three seeds. Each task uses its own selected ensemble.${interactive ? ' Focus a task label to read all three scores in its tooltip.' : ''}</desc>
+    <style>.radar-label text{font-family:Arial,Helvetica,sans-serif;font-size:${compact ? '15.5' : '16'}px;fill:#393939}.radar-label .radar-range{font-size:${compact ? '12.5' : '11.5'}px;fill:#868686}.radar-label .radar-delta{font-size:${compact ? '13' : '12'}px;fill:#5e5e5e}.radar-label .negative{fill:#707070}.radar-tick{font-family:Arial,Helvetica,sans-serif;font-size:12px;fill:#9a9a9a}.radar-label:focus{outline:none}.radar-label:focus .radar-label-hit{stroke:#5e5e5e;stroke-width:1.5}.radar-label[aria-pressed="true"]>text:first-of-type{fill:#5e5e5e}.radar-series{transition:opacity 140ms ease}.radar-point,.radar-label[role="button"]{cursor:pointer}@media(prefers-reduced-motion:reduce){.radar-series{transition:none}}</style>
+    ${axes}${grids}${series}${labels}
+  </svg>`;
+}

@@ -1,0 +1,215 @@
+{
+  "model": "Qwen2.5-1.5B-Instruct",
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "source": {
+    "primary": "Table 3(a), tab:iterative-es",
+    "fullPopulation": "Table D2, tab:es_full_endpoints",
+    "accounting": "Appendix D.2, eq:mn_total_eval_budget, eq:es_total_eval_budget, eq:zo_total_eval_budget"
+  },
+  "budget": {
+    "trainingPrompts": 200,
+    "iterativePerturbations": 3000,
+    "developmentEvaluations": 8000,
+    "includes": "Main-run search/training, checkpoint selection, and final test evaluation",
+    "excludes": "Preparation, hyperparameter selection, and unused intermediate ES test monitoring",
+    "unit": "model-prompt evaluations"
+  },
+  "methods": [
+    {
+      "id": "modular",
+      "label": "MN RandOpt · K=25",
+      "color": "#306FAD",
+      "marker": "circle"
+    },
+    {
+      "id": "es",
+      "label": "Iterative ES",
+      "color": "#66866B",
+      "marker": "diamond"
+    },
+    {
+      "id": "zo",
+      "label": "ZO-Finetuner",
+      "color": "#9069B2",
+      "marker": "triangle"
+    },
+    {
+      "id": "mezo",
+      "label": "MeZO",
+      "color": "#C76526",
+      "marker": "square"
+    },
+    {
+      "id": "modular_single",
+      "label": "MN RandOpt · K=1",
+      "color": "#91979E",
+      "marker": "open-circle"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "countdown",
+      "label": "Countdown",
+      "testExamples": 1500,
+      "domain": [
+        10,
+        45
+      ],
+      "ticks": [
+        10,
+        20,
+        30,
+        40
+      ],
+      "points": [
+        {
+          "id": "mn100",
+          "method": "modular",
+          "n": 100,
+          "k": 25,
+          "mean": 38.4,
+          "sd": 2.71,
+          "source": "Table 3(a)"
+        },
+        {
+          "id": "mnmatched",
+          "method": "modular",
+          "n": 2820,
+          "k": 25,
+          "mean": 39.09,
+          "sd": 1.56,
+          "source": "Table 3(a)"
+        },
+        {
+          "id": "mn3000",
+          "method": "modular",
+          "n": 3000,
+          "k": 25,
+          "mean": 38.44,
+          "sd": 1.2,
+          "source": "Table D2"
+        },
+        {
+          "id": "es",
+          "method": "es",
+          "n": 3000,
+          "k": 1,
+          "mean": 35.67,
+          "sd": 5.08,
+          "source": "Table 3(a)"
+        },
+        {
+          "id": "zo",
+          "method": "zo",
+          "n": 3000,
+          "k": 1,
+          "mean": 29.56,
+          "sd": 0.82,
+          "source": "Table 3(a)"
+        },
+        {
+          "id": "mezo",
+          "method": "mezo",
+          "n": 3000,
+          "k": 1,
+          "mean": null,
+          "sd": null,
+          "source": "Table 3(a)"
+        },
+        {
+          "id": "mn_single",
+          "method": "modular_single",
+          "n": 3000,
+          "k": 1,
+          "mean": 16.18,
+          "sd": 1.08,
+          "source": "Table 3(a)"
+        }
+      ]
+    },
+    {
+      "id": "gsm8k",
+      "label": "GSM8K",
+      "testExamples": 1319,
+      "domain": [
+        60,
+        77
+      ],
+      "ticks": [
+        60,
+        65,
+        70,
+        75
+      ],
+      "points": [
+        {
+          "id": "mn100",
+          "method": "modular",
+          "n": 100,
+          "k": 25,
+          "mean": 73.16,
+          "sd": 0.66,
+          "source": "Table 3(a)"
+        },
+        {
+          "id": "mnmatched",
+          "method": "modular",
+          "n": 2841,
+          "k": 25,
+          "mean": 74.43,
+          "sd": 0.81,
+          "source": "Table 3(a)"
+        },
+        {
+          "id": "mn3000",
+          "method": "modular",
+          "n": 3000,
+          "k": 25,
+          "mean": 74.45,
+          "sd": 0.95,
+          "source": "Table D2"
+        },
+        {
+          "id": "es",
+          "method": "es",
+          "n": 3000,
+          "k": 1,
+          "mean": 73.11,
+          "sd": 0.52,
+          "source": "Table 3(a)"
+        },
+        {
+          "id": "zo",
+          "method": "zo",
+          "n": 3000,
+          "k": 1,
+          "mean": 72.53,
+          "sd": 0.58,
+          "source": "Table 3(a)"
+        },
+        {
+          "id": "mezo",
+          "method": "mezo",
+          "n": 3000,
+          "k": 1,
+          "mean": null,
+          "sd": null,
+          "source": "Table 3(a)"
+        },
+        {
+          "id": "mn_single",
+          "method": "modular_single",
+          "n": 3000,
+          "k": 1,
+          "mean": 64.42,
+          "sd": 0.29,
+          "source": "Table 3(a)"
+        }
+      ]
+    }
+  ]
+}

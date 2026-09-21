@@ -1,0 +1,45 @@
+.figure2-section { padding-top: 74px; padding-bottom: 62px; background: #ffffff; }
+.figure2-section .section-intro { max-width: 760px; }
+.figure2-section .figure2-model { font: 11px/1.7 var(--mono); color: #787878; margin-top: 18px; }
+.figure2 { margin-top: 30px; background: #ffffff; }
+.figure2-toolbar { display: flex; justify-content: flex-end; min-height: 34px; margin-bottom: 3px; }
+.figure2-replay { display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 0; padding: 7px 0 7px 14px; font-size: 11px; color: #777; }
+.figure2-replay:hover { color: #161616; }
+.figure2-replay:disabled { color: #aaa; cursor: default; }
+.figure2-replay svg { width: 13px; height: 13px; }
+.figure2-scroll { overflow-x: auto; scrollbar-width: thin; scrollbar-color: #c7c7c7 #fff; }
+.figure2-svg { display: block; width: 100%; height: auto; background: #ffffff; }
+.figure2 figcaption { margin: 21px auto 0; max-width: 800px; text-align: center; font-size: 10px; color: #838383; line-height: 1.8; }
+.figure2-section + .results-section { padding-top: 64px; border-top: 1px solid #e5e5e5; }
+
+/* Observe rows independently: the second row waits until it enters the viewport. */
+.figure2-row[data-reveal='waiting'] .f2-axes,
+.figure2-row[data-reveal='waiting'] .f2-data,
+.figure2-row[data-reveal='waiting'] .f2-emphasis { opacity: 0; }
+.figure2-row[data-reveal='waiting'] .f2-sweep { transform: scaleX(0); }
+.figure2-row[data-reveal='playing'] { animation: figure2-sequence 3100ms linear both; }
+.figure2-row[data-reveal='playing'] .f2-axes { animation: figure2-fade 420ms ease-out var(--panel-delay) both; }
+/* Reveal every point in a row together, then draw the connecting curves. */
+.figure2-row[data-reveal='playing'] .f2-point { animation: figure2-fade 240ms ease-out 420ms both; }
+.figure2-row[data-reveal='playing'] .f2-sweep { animation: figure2-draw 1400ms cubic-bezier(.33,1,.68,1) calc(800ms + var(--panel-delay)) both; }
+.figure2-row[data-reveal='playing'] .f2-bands { animation: figure2-fade 800ms ease-out calc(1000ms + var(--panel-delay)) both; }
+.figure2-row[data-reveal='playing'] .f2-emphasis { animation: figure2-rise 450ms cubic-bezier(.22,.61,.36,1) calc(2400ms + var(--panel-delay)) both; }
+.figure2-row[data-visible='false'], .figure2-row[data-visible='false'] *,
+.figure2[data-paused='true'] *, html[data-motion='paused'] .figure2 * { animation-play-state: paused !important; }
+@keyframes figure2-sequence { from { opacity: 1; } to { opacity: 1; } }
+@keyframes figure2-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes figure2-rise { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes figure2-draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (max-width: 760px) {
+  .figure2-section { padding: 54px 20px 46px; }
+  /* Keep the paper's 2 × 2 arrangement and readable labels on narrow screens. */
+  .figure2-svg { min-width: 760px; }
+  .figure2-scroll { padding-bottom: 8px; }
+  .figure2-section + .results-section { padding-top: 48px; }
+  .figure2 figcaption { font-size: 9px; text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .figure2 * { animation: none !important; }
+  .figure2 .f2-axes, .figure2 .f2-data, .figure2 .f2-point, .figure2 .f2-bands, .figure2 .f2-emphasis { opacity: 1 !important; transform: none !important; }
+  .figure2 .f2-sweep { transform: none !important; }
+}

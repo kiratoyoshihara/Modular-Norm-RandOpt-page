@@ -1,0 +1,10 @@
+{
+  "source": "Draft Table 3(c), label tab:efficiency_controls / tab:ablations",
+  "conditions": { "task": "Countdown", "model": "Qwen2.5-1.5B-Instruct", "population": 100, "ensemble": 25, "seeds": [42, 43, 44], "unit": "accuracy (%)", "uncertainty": "sample standard deviation" },
+  "full": { "label": "Full method", "mean": 37.80, "sd": 0.87 },
+  "controls": {
+    "norms": { "label": "Frobenius norm", "mean": 34.40, "sd": 0.72 },
+    "mass": { "label": "No recursive scaling", "mean": 35.80, "sd": 1.22 },
+    "sensitivity": { "label": "No sensitivity correction", "mean": 36.87, "sd": 1.62 }
+  }
+}

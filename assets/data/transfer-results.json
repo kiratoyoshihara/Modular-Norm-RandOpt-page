@@ -1,0 +1,372 @@
+{
+  "source": {
+    "table": "1(a)",
+    "texLabel": "tab:transfer_runtime",
+    "pdfPage": 5
+  },
+  "conditions": {
+    "population": 100,
+    "ensemble": 25,
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "dispersion": "sample standard deviation",
+    "calibration": "Profile calibrated on Countdown separately for each model scale; transferred unchanged across tasks. Candidate selection is task-specific."
+  },
+  "tasks": [
+    {
+      "id": "countdown",
+      "label": "Countdown",
+      "category": "Arithmetic",
+      "metric": "Accuracy"
+    },
+    {
+      "id": "gsm8k",
+      "label": "GSM8K",
+      "category": "Mathematical reasoning",
+      "metric": "Accuracy"
+    },
+    {
+      "id": "mbpp",
+      "label": "MBPP",
+      "category": "Code generation",
+      "metric": "Accuracy"
+    },
+    {
+      "id": "rocstories",
+      "label": "ROCStories",
+      "category": "Sentence ordering",
+      "metric": "Accuracy"
+    },
+    {
+      "id": "uspto",
+      "label": "USPTO-50K",
+      "category": "Reaction classification",
+      "metric": "Balanced accuracy"
+    },
+    {
+      "id": "math500",
+      "label": "MATH-500",
+      "category": "Mathematical reasoning",
+      "metric": "Accuracy"
+    },
+    {
+      "id": "olympiad",
+      "label": "OlympiadBench",
+      "category": "Mathematical reasoning",
+      "metric": "Accuracy"
+    }
+  ],
+  "methods": [
+    {
+      "id": "modular",
+      "name": "Modular Norm RandOpt",
+      "shortName": "MN RandOpt",
+      "color": "#0155bf",
+      "dash": ""
+    },
+    {
+      "id": "randopt",
+      "name": "RandOpt",
+      "shortName": "RandOpt",
+      "color": "#bc652c",
+      "dash": "7 5"
+    },
+    {
+      "id": "rmsnorm",
+      "name": "RMSNorm-only",
+      "shortName": "RMSNorm-only",
+      "color": "#8651c9",
+      "dash": "2 5"
+    }
+  ],
+  "scales": {
+    "0.5B": {
+      "label": "Qwen2.5-0.5B-Instruct",
+      "scores": {
+        "randopt": {
+          "countdown": {
+            "mean": 7.73,
+            "sd": 0.83
+          },
+          "gsm8k": {
+            "mean": 53.35,
+            "sd": 0.58
+          },
+          "mbpp": {
+            "mean": 26.73,
+            "sd": 0.99
+          },
+          "rocstories": {
+            "mean": 0.82,
+            "sd": 0.03
+          },
+          "uspto": {
+            "mean": 10.0,
+            "sd": 0.0
+          },
+          "math500": {
+            "mean": 38.67,
+            "sd": 0.58
+          },
+          "olympiad": {
+            "mean": 14.42,
+            "sd": 1.36
+          }
+        },
+        "rmsnorm": {
+          "countdown": {
+            "mean": 1.27,
+            "sd": 0.31
+          },
+          "gsm8k": {
+            "mean": 45.36,
+            "sd": 0.24
+          },
+          "mbpp": {
+            "mean": 26.27,
+            "sd": 0.81
+          },
+          "rocstories": {
+            "mean": 0.89,
+            "sd": 0.01
+          },
+          "uspto": {
+            "mean": 10.0,
+            "sd": 0.0
+          },
+          "math500": {
+            "mean": 29.67,
+            "sd": 0.33
+          },
+          "olympiad": {
+            "mean": 11.32,
+            "sd": 0.32
+          }
+        },
+        "modular": {
+          "countdown": {
+            "mean": 9.6,
+            "sd": 2.8
+          },
+          "gsm8k": {
+            "mean": 55.85,
+            "sd": 0.76
+          },
+          "mbpp": {
+            "mean": 24.73,
+            "sd": 2.37
+          },
+          "rocstories": {
+            "mean": 0.77,
+            "sd": 0.05
+          },
+          "uspto": {
+            "mean": 10.0,
+            "sd": 0.0
+          },
+          "math500": {
+            "mean": 39.67,
+            "sd": 1.76
+          },
+          "olympiad": {
+            "mean": 14.56,
+            "sd": 1.27
+          }
+        }
+      }
+    },
+    "1.5B": {
+      "label": "Qwen2.5-1.5B-Instruct",
+      "scores": {
+        "randopt": {
+          "countdown": {
+            "mean": 35.67,
+            "sd": 1.22
+          },
+          "gsm8k": {
+            "mean": 68.39,
+            "sd": 1.12
+          },
+          "mbpp": {
+            "mean": 49.47,
+            "sd": 0.81
+          },
+          "rocstories": {
+            "mean": 6.89,
+            "sd": 0.12
+          },
+          "uspto": {
+            "mean": 11.34,
+            "sd": 0.6
+          },
+          "math500": {
+            "mean": 58.33,
+            "sd": 1.2
+          },
+          "olympiad": {
+            "mean": 28.62,
+            "sd": 0.74
+          }
+        },
+        "rmsnorm": {
+          "countdown": {
+            "mean": 24.0,
+            "sd": 0.35
+          },
+          "gsm8k": {
+            "mean": 62.04,
+            "sd": 0.39
+          },
+          "mbpp": {
+            "mean": 48.4,
+            "sd": 0.35
+          },
+          "rocstories": {
+            "mean": 6.65,
+            "sd": 0.01
+          },
+          "uspto": {
+            "mean": 10.77,
+            "sd": 0.04
+          },
+          "math500": {
+            "mean": 54.33,
+            "sd": 0.67
+          },
+          "olympiad": {
+            "mean": 23.84,
+            "sd": 0.37
+          }
+        },
+        "modular": {
+          "countdown": {
+            "mean": 37.8,
+            "sd": 0.87
+          },
+          "gsm8k": {
+            "mean": 74.2,
+            "sd": 0.32
+          },
+          "mbpp": {
+            "mean": 49.13,
+            "sd": 0.81
+          },
+          "rocstories": {
+            "mean": 6.65,
+            "sd": 0.08
+          },
+          "uspto": {
+            "mean": 11.65,
+            "sd": 0.57
+          },
+          "math500": {
+            "mean": 59.67,
+            "sd": 0.33
+          },
+          "olympiad": {
+            "mean": 29.75,
+            "sd": 0.76
+          }
+        }
+      }
+    },
+    "3B": {
+      "label": "Qwen2.5-3B-Instruct",
+      "scores": {
+        "randopt": {
+          "countdown": {
+            "mean": 49.53,
+            "sd": 0.64
+          },
+          "gsm8k": {
+            "mean": 86.08,
+            "sd": 0.23
+          },
+          "mbpp": {
+            "mean": 60.13,
+            "sd": 0.46
+          },
+          "rocstories": {
+            "mean": 14.22,
+            "sd": 0.05
+          },
+          "uspto": {
+            "mean": 12.95,
+            "sd": 0.61
+          },
+          "math500": {
+            "mean": 68.33,
+            "sd": 0.58
+          },
+          "olympiad": {
+            "mean": 41.91,
+            "sd": 0.8
+          }
+        },
+        "rmsnorm": {
+          "countdown": {
+            "mean": 41.6,
+            "sd": 0.6
+          },
+          "gsm8k": {
+            "mean": 82.97,
+            "sd": 0.12
+          },
+          "mbpp": {
+            "mean": 57.93,
+            "sd": 0.31
+          },
+          "rocstories": {
+            "mean": 13.9,
+            "sd": 0.05
+          },
+          "uspto": {
+            "mean": 15.11,
+            "sd": 0.4
+          },
+          "math500": {
+            "mean": 63.11,
+            "sd": 0.69
+          },
+          "olympiad": {
+            "mean": 36.43,
+            "sd": 0.64
+          }
+        },
+        "modular": {
+          "countdown": {
+            "mean": 52.13,
+            "sd": 0.99
+          },
+          "gsm8k": {
+            "mean": 86.15,
+            "sd": 0.16
+          },
+          "mbpp": {
+            "mean": 60.33,
+            "sd": 0.61
+          },
+          "rocstories": {
+            "mean": 13.98,
+            "sd": 0.06
+          },
+          "uspto": {
+            "mean": 13.95,
+            "sd": 0.47
+          },
+          "math500": {
+            "mean": 69.0,
+            "sd": 1.2
+          },
+          "olympiad": {
+            "mean": 41.7,
+            "sd": 0.32
+          }
+        }
+      }
+    }
+  }
+}

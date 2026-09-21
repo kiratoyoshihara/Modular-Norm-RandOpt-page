@@ -1,0 +1,168 @@
+// DOM-level checks: interaction and reveal lifecycle, not browser visual testing.
+// Setup: npm install --prefix .local/verification --no-save --package-lock=false --ignore-scripts jsdom
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+import { createRequire } from 'node:module';
+import { RadarChart } from '../assets/js/radar-chart.js';
+
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const { JSDOM } = createRequire(resolve(root, '.local/verification/package.json'))('jsdom');
+const html = await readFile(resolve(root, 'index.html'), 'utf8');
+const data = JSON.parse(await readFile(resolve(root, 'assets/data/transfer-results.json'), 'utf8'));
+const dom = new JSDOM(html, { url: 'http://127.0.0.1:8000/' });
+globalThis.window = dom.window;
+globalThis.document = dom.window.document;
+const mediaQuery = () => ({ matches: false, listeners: new Set(), addEventListener(type, fn) { this.listeners.add(fn); }, removeEventListener(type, fn) { this.listeners.delete(fn); }, emit() { this.listeners.forEach(fn => fn()); } });
+const mobile=mediaQuery(), reduced=mediaQuery();
+window.matchMedia = query => query.includes('reduced-motion') ? reduced : mobile;
+class Observer {
+  constructor(callback) { this.callback = callback; this.disconnected=false; }
+  observe(target) { this.target=target; }
+  disconnect() { this.disconnected=true; }
+  emit(ratio) { if(!this.disconnected) this.callback([{target:this.target,isIntersecting:ratio>0,intersectionRatio:ratio}]); }
+}
+window.IntersectionObserver=Observer;
+document.documentElement.dataset.motion='running';
+const component = document.querySelector('#radar-component');
+const chart = new RadarChart(component, data);
+const query = selector => component.querySelector(selector);
+const key = (element, name) => element.dispatchEvent(new window.KeyboardEvent('keydown', { key: name, bubbles: true, cancelable: true }));
+const pointer = (element, type, relatedTarget=null) => element.dispatchEvent(new window.MouseEvent(type,{bubbles:true,clientX:190,clientY:100,relatedTarget}));
+const task = id => query(`.radar-label[data-task="${id}"]`);
+const area = id => query(`[data-series="${id}"] .radar-area`);
+
+assert.equal(query('#radar-fallback').hidden,true);
+assert.equal(query('[data-scale="1.5B"]').getAttribute('aria-selected'),'true');
+for(const selector of ['[data-radar-mode]','#score-readout','.radar-range','.radar-delta','.results-table','#radar-table-body']) assert.equal(query(selector),null,`${selector} is removed`);
+assert.equal(document.querySelector('#efficiency'),null);
+assert.equal(document.querySelector('#analysis'),null);
+assert.equal(chart.revealState,'waiting');
+assert.equal(query('#radar-mount').dataset.reveal,'waiting');
+chart.revealObserver.emit(.15);
+assert.equal(chart.revealState,'waiting');
+chart.revealObserver.emit(.3);
+assert.equal(chart.revealState,'playing');
+chart.revealObserver.emit(0);
+assert.equal(query('#radar-mount').dataset.revealVisible,'false');
+chart.revealObserver.emit(.4);
+assert.equal(query('#radar-mount').dataset.revealVisible,'true');
+Object.defineProperty(document,'hidden',{configurable:true,value:true});
+document.dispatchEvent(new window.Event('visibilitychange'));
+assert.equal(query('#radar-mount').dataset.revealPaused,'true');
+Object.defineProperty(document,'hidden',{configurable:true,value:false});
+document.dispatchEvent(new window.Event('visibilitychange'));
+assert.equal(query('#radar-mount').dataset.revealPaused,'false');
+const done = new window.Event('animationend',{bubbles:true});
+Object.defineProperty(done,'animationName',{value:'radar-sequence'});
+query('.radar-svg').dispatchEvent(done);
+assert.equal(chart.revealState,'complete');
+chart.revealObserver.emit(0);chart.revealObserver.emit(.6);
+assert.equal(chart.revealState,'complete','Do not replay on repeated scrolling');
+for(const method of data.methods) {
+  const series=query(`[data-series="${method.id}"]`);
+  assert.equal(series.style.color,method.id==='rmsnorm'?'rgb(134, 81, 201)':series.style.color);
+  assert.ok(series.querySelector('.radar-outline').hasAttribute('mask'));
+  assert.ok(series.querySelector('.radar-draw-mask'),'Mask preserves dashed outlines while revealing them');
+  const points=[...series.querySelectorAll('.radar-point')];
+  assert.equal(points.length,7);
+  const delays=points.map(point=>parseFloat(point.style.getPropertyValue('--point-delay')));
+  assert.ok(delays.every((delay,i)=>i===0||delay>delays[i-1]),'Task points appear in order');
+  const legend=query(`[data-method="${method.id}"]`);
+  assert.equal(legend.disabled,false);
+  assert.equal(legend.style.getPropertyValue('--series-color'),method.color);
+  assert.equal(legend.querySelector('circle').getAttribute('cx'),'15');
+  assert.equal(legend.querySelector('circle').getAttribute('cy'),'8');
+  assert.equal(legend.querySelector('path').getAttribute('d'),'M1 8H29');
+}
+
+pointer(query('[data-series="rmsnorm"] .radar-line-hit'),'pointerover');
+assert.equal(area('rmsnorm').style.fillOpacity,'0.26');
+assert.equal(query('[data-series="modular"]').style.opacity,'0.18');
+assert.equal(query('#radar-tooltip').hidden,true);
+pointer(query('[data-series="rmsnorm"] .radar-line-hit'),'pointerout');
+assert.equal(area('rmsnorm').style.fillOpacity,'0.035');
+assert.equal(query('[data-series="modular"]').style.opacity,'1');
+const baseline = query('[data-method="randopt"]');
+pointer(baseline,'pointerenter');
+assert.equal(area('randopt').style.fillOpacity,'0.26');
+pointer(baseline,'pointerleave');
+baseline.click();
+assert.equal(baseline.getAttribute('aria-pressed'),'true');
+assert.equal(area('randopt').style.fillOpacity,'0.26');
+key(baseline,'Escape');
+assert.equal(baseline.getAttribute('aria-pressed'),'false');
+assert.equal(area('randopt').style.fillOpacity,'0.035');
+query('[data-series="rmsnorm"] .radar-line-hit').dispatchEvent(new window.MouseEvent('click',{bubbles:true}));
+assert.equal(query('[data-method="rmsnorm"]').getAttribute('aria-pressed'),'true');
+key(query('[data-method="rmsnorm"]'),'Escape');
+
+pointer(task('rocstories'),'pointerover');
+assert.match(query('#radar-tooltip').textContent,/6\.65 ± 0\.08/);
+assert.match(query('#radar-tooltip').textContent,/−0\.24 pp/);
+assert.match(query('#radar-tooltip').textContent,/6\.4–7\.2%/);
+pointer(task('rocstories'),'pointerout');
+assert.equal(query('#radar-tooltip').hidden,true);
+query('[data-scale="0.5B"]').click();
+pointer(task('gsm8k'),'pointerover');
+assert.match(query('#radar-tooltip').textContent,/55\.85/);
+key(query('[data-scale="0.5B"]'),'ArrowLeft');
+assert.equal(query('[data-scale="3B"]').getAttribute('aria-selected'),'true');
+assert.equal(document.activeElement.dataset.scale,'3B');
+key(query('[data-scale="3B"]'),'Home');
+assert.equal(query('[data-scale="0.5B"]').getAttribute('aria-selected'),'true');
+key(query('[data-scale="0.5B"]'),'End');
+assert.equal(query('[data-scale="3B"]').getAttribute('aria-selected'),'true');
+task('uspto').focus();
+assert.match(query('#radar-tooltip').textContent,/Balanced accuracy/);
+assert.match(query('#radar-tooltip').textContent,/13\.95/);
+assert.equal(task('uspto').getAttribute('aria-describedby'),'radar-tooltip');
+query('[data-scale="1.5B"]').click();
+assert.equal(query('#radar-tooltip').hidden,false,'Focused task is restored with current values');
+assert.match(query('#radar-tooltip').textContent,/11\.65/);
+mobile.matches=true;mobile.emit();
+assert.ok(query('.radar-svg-compact'));
+task('countdown').dispatchEvent(new window.MouseEvent('click',{bubbles:true}));
+assert.equal(query('#radar-tooltip').hidden,false,'Touch-sized layout keeps values available on tap');
+assert.match(query('#radar-tooltip').textContent,/37\.80/);
+pointer(document.body,'pointerdown');
+assert.equal(query('#radar-tooltip').hidden,true);
+chart.destroy();
+
+function freshChart(source=data) {
+  document.body.innerHTML=new JSDOM(html).window.document.body.innerHTML;
+  return new RadarChart(document.querySelector('#radar-component'),source);
+}
+reduced.matches=true;
+const quiet=freshChart();
+assert.equal(quiet.revealState,'complete','Reduced motion displays complete data immediately');
+quiet.destroy();
+reduced.matches=false;
+const preferenceChange=freshChart();
+preferenceChange.revealObserver.emit(.4);
+reduced.matches=true;reduced.emit();
+assert.equal(preferenceChange.revealState,'complete');
+preferenceChange.destroy();
+reduced.matches=false;
+const pause=freshChart();
+pause.revealObserver.emit(.4);
+document.dispatchEvent(new window.CustomEvent('research-motion-change',{detail:{playing:false}}));
+assert.equal(pause.revealState,'complete','Global pause never strands an unreadable partial chart');
+pause.destroy();
+const skip=freshChart();
+skip.revealObserver.emit(.4);
+document.querySelector('[data-method="rmsnorm"]').focus();
+assert.equal(skip.revealState,'complete','User interaction skips the reveal');
+skip.destroy();
+const missing=structuredClone(data);
+missing.scales['1.5B'].scores.modular.gsm8k={mean:null,sd:null};
+const partial=freshChart(missing);
+const missingRoot=document.querySelector('#radar-component');
+missingRoot.querySelector('.radar-label[data-task="gsm8k"]').focus();
+assert.match(missingRoot.querySelector('#radar-tooltip').textContent,/N\/A/);
+assert.equal(missingRoot.querySelectorAll('[data-series="modular"] polygon').length,0);
+assert.equal(missingRoot.querySelectorAll('[data-series="modular"] .radar-point').length,6);
+partial.destroy();
+dom.window.close();
+console.log('Passed: simplified chart, RMSNorm color, centered legends, outline/legend fill and pin, tooltips on hover/focus/tap, model tabs, reveal lifecycle, reduced motion/global pause, and missing data.');

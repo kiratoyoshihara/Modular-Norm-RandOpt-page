@@ -1,0 +1,38 @@
+.section-nav { display: none; }
+
+@media (min-width: 1280px) {
+  /* Reserve a gutter so the fixed outline never covers the figures. */
+  body { padding-inline: 160px; }
+  .section-nav {
+    display: block;
+    position: fixed;
+    top: 140px;
+    left: max(20px, calc((100vw - 1160px) / 2 - 140px));
+    width: 140px;
+    z-index: 5;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .4s ease, visibility .4s;
+  }
+  .section-nav[data-visible='true'] { opacity: 1; visibility: visible; }
+  .section-nav a {
+    display: block;
+    border-left: 1px solid #e3e3e3;
+    padding: 7px 0 7px 14px;
+    color: #919191;
+    font-size: 12px;
+    line-height: 1.5;
+    text-decoration: none;
+    transition: color .2s ease, border-color .2s ease, padding-left .2s ease;
+  }
+  .section-nav a:hover,
+  .section-nav a[aria-current='location'] {
+    color: #161616;
+    border-left-color: #161616;
+    padding-left: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-nav, .section-nav a { transition: none; }
+}

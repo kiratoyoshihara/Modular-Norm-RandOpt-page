@@ -1,0 +1,36 @@
+.iterative-section { background: #ffffff; padding-top: 60px; padding-bottom: 62px; border-top: 1px solid #e5e5e5; }
+.iterative-section .iterative-model { font: 11px/1.7 var(--mono); color: #787878; margin-top: 18px; }
+.iterative-chart { position: relative; background: #fff; margin-top: 36px; }
+.iterative-legend { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 9px 19px; }
+.iterative-legend button, .iterative-unreported { display: inline-flex; align-items: center; gap: 6px; background: #fff; color: var(--method-color); border: 0; padding: 5px 0; font-size: 11px; white-space: nowrap; }
+.iterative-legend button[aria-pressed='true'] { text-decoration: underline; text-underline-offset: 5px; }
+.iterative-legend button:disabled { opacity: 1; cursor: default; }
+.iterative-unreported small { font-size: 9px; color: #888; margin-left: 2px; }
+.iterative-chart .figure2-toolbar { margin: 4px 0 13px; }
+.iterative-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; }
+.iterative-panel { min-width: 0; }
+.iterative-panel h3 { text-align: center; font-size: 17px; font-weight: 550; letter-spacing: -.35px; }
+.iterative-panel > p { text-align: center; font-size: 10px; color: #999; margin-top: 5px; }
+.iterative-svg { display: block; width: 100%; height: auto; background: #fff; margin-top: 10px; }
+.iterative-axis-label { text-align: center; font-size: 12px; color: #777; margin-top: -8px; }
+.iterative-y-label { font-size: 10px; color: #999; margin: 0 0 8px 3px; }
+.iterative-chart figcaption { max-width: 900px; margin-top: 23px; }
+.iterative-section + .results-section { border-top: 1px solid #e5e5e5; padding-top: 64px; }
+.iterative-tooltip { position: absolute; z-index: 3; width: 270px; max-width: calc(100% - 16px); padding: 14px 16px; background: #fff; border: 1px solid #e2e2e2; border-radius: 6px; box-shadow: 0 4px 20px #33333314; pointer-events: none; font-size: 10.5px; }
+.iterative-tooltip > strong { display: block; font-size: 12px; font-weight: 550; }
+.iterative-tooltip > span { display: block; color: #888; margin-top: 4px; font-size: 10px; }
+.iterative-tooltip dl { margin: 12px 0 8px; }
+.iterative-tooltip dl > div { display: flex; justify-content: space-between; gap: 10px; margin-top: 5px; }
+.iterative-tooltip dt { color: #888; }
+.iterative-tooltip dd { margin: 0; font-variant-numeric: tabular-nums; }
+.iterative-tooltip small { color: #999; font-size: 9px; }
+.iterative-chart .figure2-row[data-reveal='playing'] .f2-data { animation: figure2-rise 1300ms ease-out 350ms both; }
+@media (max-width: 700px) {
+  .iterative-section { padding: 48px 20px; }
+  .iterative-grid { grid-template-columns: 1fr; gap: 28px; }
+  .iterative-legend { gap: 6px 13px; }
+  .iterative-legend button, .iterative-unreported { font-size: 10px; }
+  .iterative-panel h3 { font-size: 16px; }
+  .iterative-chart figcaption { text-align: left; }
+  .iterative-axis-label { font-size: 11px; }
+}

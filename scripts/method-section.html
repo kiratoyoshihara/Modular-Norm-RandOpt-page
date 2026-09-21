@@ -1,0 +1,68 @@
+    <section class="method-band" id="method" aria-labelledby="method-title">
+      <div class="section">
+        <div class="section-intro centered">
+          <p class="eyebrow">01 <span class="eyebrow-rule"></span> The idea</p>
+          <h2 id="method-title">A different geometry.<br>A more efficient ensemble.</h2>
+          <p><a href="https://thickets.mit.edu/" target="_blank" rel="noopener">Neural Thickets</a> finds task experts around pretrained weights. We follow its sample–select–vote approach, with perturbations shaped by the model’s architecture.</p>
+        </div>
+
+        <figure class="algorithm-experience motion-scene" id="method-demo" data-phase="0" data-visible="false" data-sampler="modular" data-replay="a">
+          <div class="algorithm-toolbar">
+            <div class="sampler-control" role="group" aria-label="Compare candidate generation">
+              <button type="button" data-sampler="randopt" aria-pressed="false" hidden>RandOpt</button>
+              <button type="button" data-sampler="modular" aria-pressed="true" hidden>Modular Norm <span>Ours</span></button>
+            </div>
+            <p class="algorithm-contract"><span aria-hidden="true">↳</span> New sampler. Shared selection &amp; voting.</p>
+          </div>
+          <div class="algorithm-title"><p>Random search in weight space <span>+ ensemble</span></p><span class="schematic-label">Illustration · N = 6, K = 3</span></div>
+          <div class="algorithm-flow" id="algorithm-flow"><!-- algorithm-flow:start --><!-- algorithm-flow:end --></div>
+          <div class="sequence-controls">
+            <div class="demo-steps" role="group" aria-label="Explore algorithm stages">
+              <button type="button" data-motion-step="0" aria-pressed="true" hidden><span>01</span> Generate</button>
+              <button type="button" data-motion-step="1" aria-pressed="false" hidden><span>02</span> Evaluate</button>
+              <button type="button" data-motion-step="2" aria-pressed="false" hidden><span>03</span> Select</button>
+              <button type="button" data-motion-step="3" aria-pressed="false" hidden><span>04</span> Vote</button>
+            </div>
+            <div class="demo-playback"><button class="motion-button" type="button" data-motion-toggle hidden>Pause animations</button><button class="motion-button replay-button" type="button" data-motion-replay aria-label="Replay from candidate generation" hidden>↺</button></div>
+          </div>
+          <div class="algorithm-detail">
+            <div class="algorithm-narrative">
+              <span class="stage-count" id="stage-count">01 / 04</span>
+              <h3 id="stage-title">Generate candidates</h3>
+              <p id="stage-description">Draw Gaussian directions, normalize each active tensor with its natural norm, then scale it using the fixed architecture-aware profile.</p>
+              <div class="algorithm-equation for-modular" role="math" aria-label="Delta theta i p equals R Z i p divided by s p times the module natural norm of Z i p.">Δθ<sub>i,p</sub> = <span class="fraction"><span>R · Z<sub>i,p</sub></span><span>s<sub>p</sub> ‖Z<sub>i,p</sub>‖<sub>ℳp</sub></span></span></div>
+              <div class="algorithm-equation for-randopt" role="math" aria-label="Delta theta i equals sigma i times Gaussian noise epsilon i.">Δθ<sub>i</sub> = σ<sub>i</sub> · ε<sub>i</sub></div>
+              <p class="calibration-note for-modular"><span aria-hidden="true">◇</span> Calibrate once on Countdown.<br>Reuse the profile across tasks.</p>
+              <p class="calibration-note for-randopt"><span aria-hidden="true">◇</span> A global scale within each candidate.<br>Scales can differ across candidates.</p>
+            </div>
+            <div class="code-panel">
+              <div class="code-heading"><span id="algorithm-name">Modular Norm RandOpt</span><span>pseudocode</span></div>
+              <div class="code-scroll" tabindex="0" role="region" aria-label="Explanatory algorithm pseudocode, scroll horizontally if needed"><pre id="algorithm-code"><!-- algorithm-code:start --><!-- algorithm-code:end --></pre></div>
+              <p class="code-footnote"><i></i> Sampling change <span>·</span> Active lines follow the diagram</p>
+            </div>
+          </div>
+          <p class="sr-only" id="motion-announcement" role="status" aria-live="polite"></p>
+          <figcaption>Seeds, scores, positions, and answers above are schematic. D<sub>cal</sub> fixes the calibration profile; D<sub>sel</sub> scores candidates for each target task. Pipeline inspired by <a href="https://thickets.mit.edu/" target="_blank" rel="noopener">Neural Thickets</a>; original interactive illustration and explanatory pseudocode.</figcaption>
+        </figure>
+
+        <div class="geometry-intro"><div><p class="eyebrow">Inside the sampler</p><h3>Three choices.<br>One architecture-aware perturbation.</h3></div><p>From the role of a tensor to its place in the network, each choice shapes how we explore the same pretrained model.</p></div>
+        <div class="geometry-lab motion-scene" id="geometry-lab" data-geometry="norms" data-visible="false">
+          <div class="geometry-tabs" role="tablist" aria-label="Explore the three sampler components">
+            <button id="geometry-tab-norms" type="button" role="tab" data-geometry="norms" aria-selected="true" aria-controls="geometry-panel" hidden><span>01</span> Natural norms</button>
+            <button id="geometry-tab-mass" type="button" role="tab" data-geometry="mass" aria-selected="false" aria-controls="geometry-panel" tabindex="-1" hidden><span>02</span> Mass allocation</button>
+            <button id="geometry-tab-sensitivity" type="button" role="tab" data-geometry="sensitivity" aria-selected="false" aria-controls="geometry-panel" tabindex="-1" hidden><span>03</span> Sensitivity</button>
+          </div>
+          <div class="geometry-panel" id="geometry-panel" role="tabpanel" aria-labelledby="geometry-tab-norms" tabindex="0">
+            <div class="geometry-main">
+              <h4 id="geometry-title">Respect what each module does.</h4>
+              <p id="geometry-text">An embedding row, a linear map, and a normalization weight act differently. Normalize each noise tensor with the norm matched to its role, before assigning its perturbation size.</p>
+              <div id="geometry-drawing"><!-- geometry-drawing:start --><!-- geometry-drawing:end --></div>
+              <div class="rho-controls" id="rho-controls" hidden><label for="rho-control">Illustrate the correction <output id="rho-value" for="rho-control">1.00</output></label><input id="rho-control" type="range" min="0.5" max="2" step="0.05" value="1"><div><span>½ · larger perturbation</span><span>2 · smaller perturbation</span></div></div>
+              <div class="geometry-formula"><span id="geometry-formula">Z<sub>p</sub> / ‖Z<sub>p</sub>‖<sub>ℳp</sub></span><p id="geometry-detail">Direction: Gaussian. Normalization: module specific.</p></div>
+            </div>
+            <aside class="ablation-panel" id="ablation-mount" aria-label="Measured ablation supporting this design choice"><!-- ablation-mount:start --><!-- ablation-mount:end --></aside>
+          </div>
+        </div>
+        <p class="geometry-note">Calibration and module scales are fixed before sampling. The sensitivity multiplier is normalized within each transformer layer and clipped to [½, 2]. The full construction is in Section 3 and Algorithm 1 of the paper. <a href="assets/data/method-ablation.json" download>Ablation data ↓</a></p>
+      </div>
+    </section>
