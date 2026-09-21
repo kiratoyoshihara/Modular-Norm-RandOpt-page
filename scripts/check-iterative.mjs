@@ -54,12 +54,19 @@ class Observer {
   constructor(fn){this.fn=fn;}
   observe(){}
   disconnect(){}
-  emit(target){this.fn([{target,isIntersecting:true,intersectionRatio:.8}]);}
+  emit(target){
+    target.getBoundingClientRect=()=>({top:100,bottom:400,left:40,right:340,width:300,height:300});
+    this.fn([{target,isIntersecting:true,intersectionRatio:.8}]);
+  }
 }
 window.IntersectionObserver=Observer;
 document.documentElement.dataset.motion='running';
 const figure=document.querySelector('#iterative-chart');
 const chart=new IterativeChart(figure);
+const touchEnter=new window.MouseEvent('pointerenter');
+Object.defineProperty(touchEnter,'pointerType',{value:'touch'});
+figure.querySelector('[data-iterative-method]').dispatchEvent(touchEnter);
+assert.ok(chart.motion.rows.every(row=>row.dataset.reveal==='waiting'),'Starting a touch scroll on the legend must not finish unseen charts');
 const tooltip=figure.querySelector('#iterative-tooltip');
 const point=id=>figure.querySelector(`[data-iterative-point='${id}']`);
 assert.equal(figure.querySelectorAll('.iterative-point').length,14);
@@ -68,8 +75,8 @@ assert.equal(figure.querySelectorAll('.iterative-error').length,0);
 assert.equal(figure.querySelectorAll('[data-iterative-series="mezo"] .iterative-point').length,2);
 assert.equal(figure.querySelectorAll('[data-iterative-series="randopt"] .iterative-point').length,2);
 assert.equal(figure.querySelector('.iterative-unreported'),null);
-assert.deepEqual([...document.querySelectorAll('main > .section')].map(section=>section.id),['overview','population-scaling','results','iterative-baselines']);
-assert.deepEqual([...document.querySelectorAll('.section-nav a')].map(link=>link.hash),['#overview','#population-scaling','#results','#iterative-baselines']);
+assert.deepEqual([...document.querySelectorAll('main > .section')].map(section=>section.id),['overview','scale','population-scaling','results','iterative-baselines']);
+assert.deepEqual([...document.querySelectorAll('.section-nav a')].map(link=>link.hash),['#overview','#scale','#population-scaling','#results','#iterative-baselines']);
 for (const marker of figure.querySelectorAll('.iterative-point')) {
   assert.equal(marker.closest('[clip-path]'),null,'Points are not clipped during their reveal');
 }

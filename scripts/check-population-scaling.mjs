@@ -71,18 +71,26 @@ class Observer {
   constructor(callback) { this.callback = callback; this.targets = new Set(); }
   observe(target) { this.targets.add(target); }
   disconnect() { this.targets.clear(); }
-  emit(target, ratio) { this.callback([{ target, intersectionRatio: ratio, isIntersecting: ratio > 0 }]); }
+  emit(target, ratio) {
+    setVisibleSlice(target, ratio);
+    this.callback([{ target: figure, isIntersecting: true }]);
+  }
+}
+function setVisibleSlice(row, ratio) {
+  const top = window.innerHeight - 300 * ratio;
+  row.getBoundingClientRect = () => ({ top, bottom: top + 300, left: 40, right: 340, width: 300, height: 300 });
 }
 window.IntersectionObserver = Observer;
 const chart = new Figure2Chart(figure);
 const [top, bottom, ...mobilePanels] = chart.rows;
 const state = () => [top, bottom].map((row) => row.dataset.reveal);
+assert.ok(chart.observer.targets.has(figure), 'Observe the HTML figure instead of SVG groups');
 assert.equal(mobilePanels.length, 4, 'Each mobile panel animates independently as it enters the viewport');
 chart.observer.emit(mobilePanels[0], .5);
 assert.deepEqual(mobilePanels.map(panel => panel.dataset.reveal), ['playing', 'waiting', 'waiting', 'waiting']);
 assert.deepEqual(state(), ['waiting', 'waiting']);
 chart.observer.emit(top, .01);
-assert.deepEqual(state(), ['playing', 'waiting'], 'A small visible slice starts the reveal without a percentage threshold');
+assert.deepEqual(state(), ['waiting', 'waiting'], 'Do not spend the animation while only a sliver of a panel is visible');
 chart.observer.emit(top, .5);
 assert.deepEqual(state(), ['playing', 'waiting'], 'Lower panels wait until they are visible');
 chart.observer.emit(top, 0);
@@ -95,8 +103,12 @@ top.dispatchEvent(done);
 assert.deepEqual(state(), ['complete', 'waiting']);
 chart.observer.emit(top, 0); chart.observer.emit(top, .7);
 assert.equal(top.dataset.reveal, 'complete', 'Scrolling back does not restart completed rows');
-chart.observer.emit(bottom, .8);
+// Scroll must reveal a later panel even when no observer callback is delivered.
+setVisibleSlice(bottom, .8);
+window.dispatchEvent(new window.Event('scroll'));
+await new Promise(resolve => window.requestAnimationFrame(resolve));
 assert.deepEqual(state(), ['complete', 'playing']);
+assert.ok(mobilePanels.slice(1).every(row => row.dataset.reveal === 'waiting'), 'Hidden responsive panels stay waiting');
 Object.defineProperty(document, 'hidden', { configurable: true, value: true });
 document.dispatchEvent(new window.Event('visibilitychange'));
 assert.equal(figure.dataset.paused, 'true');

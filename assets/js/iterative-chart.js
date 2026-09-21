@@ -1,4 +1,4 @@
-import { Figure2Chart } from './figure2-chart.js?v=chart-reveal-2';
+import { Figure2Chart } from './figure2-chart.js?v=chart-reveal-3';
 import { escapeHTML as esc } from './radar-svg.js';
 
 export class IterativeChart {
@@ -12,7 +12,8 @@ export class IterativeChart {
     const listen = (target,event,handler) => { target.addEventListener(event,handler); this.listeners.push([target,event,handler]); };
     this.legend.forEach((button) => {
       button.disabled = false;
-      for (const event of ['pointerenter','focus']) listen(button,event,() => this.highlight(button.dataset.iterativeMethod));
+      listen(button,'pointerenter',(event) => { if (event.pointerType !== 'touch') this.highlight(button.dataset.iterativeMethod); });
+      listen(button,'focus',() => this.highlight(button.dataset.iterativeMethod));
       for (const event of ['pointerleave','blur']) listen(button,event,() => this.highlight(this.pinned));
       listen(button,'click',() => {
         this.pinned = this.pinned === button.dataset.iterativeMethod ? null : button.dataset.iterativeMethod;

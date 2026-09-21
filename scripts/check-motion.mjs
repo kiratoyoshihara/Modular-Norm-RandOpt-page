@@ -24,6 +24,13 @@ for (const reducedOnLoad of [false, true]) {
     observe(target) { this.targets.add(target); }
     disconnect() { this.targets.clear(); }
     emit(visible) {
+      this.targets.forEach(target => {
+        if (!target.matches('#figure2, #iterative-chart')) return;
+        target.querySelectorAll('.figure2-row').forEach(row => {
+          const top = visible ? 100 : 10000;
+          row.getBoundingClientRect = () => ({ top, bottom: top + 300, left: 40, right: 340, width: 300, height: 300 });
+        });
+      });
       this.callback([...this.targets].map(target => ({ target, isIntersecting: visible, intersectionRatio: visible ? 1 : 0 })));
     }
   };
