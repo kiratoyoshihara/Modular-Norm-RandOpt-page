@@ -6,18 +6,36 @@
   <meta name="description" content="Modular Norm RandOpt: population-efficient ensembling through architecture-aware perturbations. Explore seven-task results and the geometry of parameter-space search.">
   <meta name="theme-color" content="#ffffff">
   <meta name="color-scheme" content="only light">
-  <meta name="robots" content="noindex, nofollow">
-  <title>Modular Norm RandOpt · Research project</title>
-  <link rel="icon" href="data:,">
+  <title>Modular Norm RandOpt: Population-Efficient Ensembling through Architecture-Aware Perturbations</title>
+  <link rel="canonical" href="https://kiratoyoshihara.github.io/Modular-Norm-RandOpt-page/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Modular Norm RandOpt">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="Modular Norm RandOpt: Population-Efficient Ensembling through Architecture-Aware Perturbations">
+  <meta property="og:description" content="Architecture-aware perturbations build stronger language model ensembles from fewer candidates. Explore the method and results across seven tasks.">
+  <meta property="og:url" content="https://kiratoyoshihara.github.io/Modular-Norm-RandOpt-page/">
+  <meta property="og:image" content="https://kiratoyoshihara.github.io/Modular-Norm-RandOpt-page/assets/social/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Modular Norm RandOpt: architecture-aware perturbations create candidate models, followed by top-K selection and voting.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Modular Norm RandOpt: Population-Efficient Ensembling through Architecture-Aware Perturbations">
+  <meta name="twitter:description" content="Architecture-aware perturbations build stronger language model ensembles from fewer candidates.">
+  <meta name="twitter:image" content="https://kiratoyoshihara.github.io/Modular-Norm-RandOpt-page/assets/social/og-image.png">
+  <meta name="twitter:image:alt" content="Modular Norm RandOpt: architecture-aware perturbations create candidate models, followed by top-K selection and voting.">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+  <link rel="icon" type="image/svg+xml" sizes="any" href="assets/icons/favicon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
   <link rel="preload" href="assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/style.css?v=white8">
   <link rel="stylesheet" href="assets/css/research.css?v=hero-type-3">
-  <link rel="stylesheet" href="assets/css/figure2.css?v=figure2-2">
+  <link rel="stylesheet" href="assets/css/figure2.css?v=mobile-layout-1">
   <link rel="stylesheet" href="assets/css/section-nav.css?v=1">
   <link rel="stylesheet" href="assets/css/iterative.css?v=iterative-n-5">
   <link rel="stylesheet" href="assets/css/method-animation.css?v=indexed-sampling-1">
   <link rel="stylesheet" href="assets/css/layout.css?v=layout15">
-  <script type="module" src="assets/js/main.js?v=overview-indexed-colors-1"></script>
+  <script type="module" src="assets/js/main.js?v=mobile-layout-1"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -36,7 +54,7 @@
       <p class="hero-affiliation">The University of Osaka</p>
       <div class="hero-actions">
         <button class="button button-primary" type="button" disabled>arXiv</button>
-        <button class="button button-outline" type="button" disabled>GitHub</button>
+        <a class="button button-outline" href="https://github.com/kiratoyoshihara/Modular-Norm-RandOpt">GitHub</a>
       </div>
     </section>
 
@@ -203,7 +221,7 @@
   </div>
   <figure class="figure2" id="figure2">
     <div class="figure2-toolbar"><button type="button" class="figure2-replay" data-figure2-replay aria-label="Replay the Figure 2 animation" hidden><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 5a5.3 5.3 0 1 1-.2 5M3 1.5V5h3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Replay</button></div>
-    <div class="figure2-scroll" tabindex="0" role="region" aria-label="Figure 2: four population-scaling panels; scroll horizontally on small screens"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 728" class="figure2-svg" role="img" aria-labelledby="figure2-title figure2-description">
+    <div class="figure2-scroll" role="region" aria-label="Population scaling: Countdown and GSM8K at K=10 and K=25"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 728" class="figure2-svg figure2-svg-desktop" role="img" aria-labelledby="figure2-title figure2-description">
   <title id="figure2-title">Population scaling on Countdown and GSM8K</title>
   <desc id="figure2-description">Qwen2.5-1.5B-Instruct. Four panels: Countdown above GSM8K; K=10 on the left and K=25 on the right. Population sizes 25, 50, 100, 200, 300 are equally spaced categories. Curves show means; shaded bands show one sample standard deviation across seeds 42, 43, 44. Modular Norm RandOpt at N=100 exceeds RandOpt at N=300 on Countdown by 1.53 and 0.93 percentage points; at N=25 it exceeds RandOpt at N=300 on GSM8K by 2.60 and 3.11 points. These are comparisons of means, not statistical significance claims. Populations are nested prefixes of the same 300 candidates per run.</desc>
   <style>
@@ -217,8 +235,14 @@
     .f2-label{font-size:17px;font-weight:550;fill:#272d35}
     .f2-curve{fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
     .f2-legend{font-size:14px;font-weight:550}
+    .figure2-svg-mobile .f2-tick{font-size:15px}
+    .figure2-svg-mobile .f2-panel-title{font-size:20px}
+    .figure2-svg-mobile .f2-saving{font-size:18px}
+    .figure2-svg-mobile .f2-note{font-size:13px}
+    .figure2-svg-mobile .f2-label{font-size:15px}
+    .figure2-svg-mobile .f2-legend{font-size:17px}
   </style>
-  <g class="f2-legend" transform="translate(360 26)"><path d="M0 0H30" stroke="#C76526" stroke-width="2.4" stroke-dasharray="7 4"/><rect x="11.5" y="-3.5" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/><text x="42" y="4.5" fill="#C76526">RandOpt</text><path d="M150 0H180" stroke="#306FAD" stroke-width="2.4"/><circle cx="165" cy="0" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/><text x="192" y="4.5" fill="#306FAD">Modular Norm RandOpt</text></g>
+  <g class="f2-legend" transform="translate(360 26)"><path d="M0 0H30" stroke="#C76526" stroke-width="2.4" stroke-dasharray="7 4"/><rect x="11.5" y="-3.5" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/><text x="42" y="4.5" fill="#C76526">RandOpt</text><g transform="translate(150 0)"><path d="M0 0H30" stroke="#306FAD" stroke-width="2.4"/><circle cx="15" cy="0" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/><text x="42" y="4.5" fill="#306FAD">Modular Norm RandOpt</text></g></g>
   <text x="19" y="384" class="f2-label" text-anchor="middle" transform="rotate(-90 19 384)">Ensemble accuracy (%)</text>
   <g class="figure2-row" data-row="countdown"><g class="f2-panel" data-panel="countdown-10" transform="translate(82 122)" style="--panel-delay:0ms">
     <title>Countdown · K=10. 3× fewer candidates; mean accuracy difference +1.53 percentage points.</title>
@@ -279,6 +303,88 @@
     </g>
   </g></g>
   <text x="584" y="719" text-anchor="middle" class="f2-label">Candidate population size N</text>
+</svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 1532" class="figure2-svg figure2-svg-mobile" role="img" aria-labelledby="figure2-mobile-title figure2-mobile-description">
+  <title id="figure2-mobile-title">Population scaling on Countdown and GSM8K</title>
+  <desc id="figure2-mobile-description">Qwen2.5-1.5B-Instruct. Four panels in one column: Countdown K=10, Countdown K=25, GSM8K K=10, GSM8K K=25. Population sizes 25, 50, 100, 200, 300 are equally spaced categories. Curves show means; shaded bands show one sample standard deviation across seeds 42, 43, 44. Modular Norm RandOpt at N=100 exceeds RandOpt at N=300 on Countdown by 1.53 and 0.93 percentage points; at N=25 it exceeds RandOpt at N=300 on GSM8K by 2.60 and 3.11 points. These are comparisons of means, not statistical significance claims. Populations are nested prefixes of the same 300 candidates per run.</desc>
+  <style>
+    .figure2-svg{font-family:Inter,Arial,Helvetica,sans-serif;background:#fff}
+    .f2-axis{fill:none;stroke:#8d96a1;stroke-width:1}
+    .f2-grid{fill:none;stroke:#e1e6ed;stroke-width:1}
+    .f2-tick{font-size:13px;fill:#687383;font-variant-numeric:tabular-nums}
+    .f2-panel-title{font-size:17px;font-weight:600;fill:#272d35}
+    .f2-saving{font-size:17px;font-weight:600;fill:#306FAD}
+    .f2-note{font-size:11.6px;fill:#687383}
+    .f2-label{font-size:17px;font-weight:550;fill:#272d35}
+    .f2-curve{fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+    .f2-legend{font-size:14px;font-weight:550}
+    .figure2-svg-mobile .f2-tick{font-size:15px}
+    .figure2-svg-mobile .f2-panel-title{font-size:20px}
+    .figure2-svg-mobile .f2-saving{font-size:18px}
+    .figure2-svg-mobile .f2-note{font-size:13px}
+    .figure2-svg-mobile .f2-label{font-size:15px}
+    .figure2-svg-mobile .f2-legend{font-size:17px}
+  </style>
+  <g class="f2-legend" transform="translate(60 22)"><path d="M0 0H30" stroke="#C76526" stroke-width="2.4" stroke-dasharray="7 4"/><rect x="11.5" y="-3.5" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/><text x="42" y="4.5" fill="#C76526">RandOpt</text><g transform="translate(0 29)"><path d="M0 0H30" stroke="#306FAD" stroke-width="2.4"/><circle cx="15" cy="0" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/><text x="42" y="4.5" fill="#306FAD">Modular Norm RandOpt</text></g></g>
+
+  <g class="figure2-row" data-row="countdown-10"><g class="f2-panel" data-panel="countdown-10" transform="translate(64 160)" style="--panel-delay:0ms">
+    <title>Countdown · K=10. 3× fewer candidates; mean accuracy difference +1.53 percentage points.</title>
+    <defs><clipPath id="figure2-mobile-countdown-10-reveal" clipPathUnits="userSpaceOnUse"><rect class="f2-sweep" x="-12" y="-12" width="332" height="214" style="transform-origin:-12px 0px"/></clipPath></defs>
+    <g class="f2-axes"><text x="0" y="-70" class="f2-panel-title">Countdown · K=10</text><path d="M0 190H308" class="f2-grid"/><text x="-13" y="194.5" text-anchor="end" class="f2-tick">25</text><path d="M0 134.1176H308" class="f2-grid"/><text x="-13" y="138.6176" text-anchor="end" class="f2-tick">30</text><path d="M0 78.2353H308" class="f2-grid"/><text x="-13" y="82.7353" text-anchor="end" class="f2-tick">35</text><path d="M0 22.3529H308" class="f2-grid"/><text x="-13" y="26.8529" text-anchor="end" class="f2-tick">40</text><path d="M0 0V190H308" class="f2-axis"/><path d="M0 190v5" class="f2-axis"/><text x="0" y="213" text-anchor="middle" class="f2-tick">25</text><path d="M77 190v5" class="f2-axis"/><text x="77" y="213" text-anchor="middle" class="f2-tick">50</text><path d="M154 190v5" class="f2-axis"/><text x="154" y="213" text-anchor="middle" class="f2-tick">100</text><path d="M231 190v5" class="f2-axis"/><text x="231" y="213" text-anchor="middle" class="f2-tick">200</text><path d="M308 190v5" class="f2-axis"/><text x="308" y="213" text-anchor="middle" class="f2-tick">300</text><text x="-44" y="95" text-anchor="middle" transform="rotate(-90 -44 95)" class="f2-label">Accuracy (%)</text><text x="154" y="242" text-anchor="middle" class="f2-label">Candidate population N</text></g>
+    <g class="f2-data">
+      <g class="f2-bands" clip-path="url(#figure2-mobile-countdown-10-reveal)"><path class="f2-band" data-method="randopt" d="M0,99.7057L77,93.2929L154,91.2086L231,81.7147L308,83.389L308,110.3365L231,109.0304L154,114.4385L77,146.6286L0,168.5296Z" fill="#C76526" fill-opacity=".09"/><path class="f2-band" data-method="modular" d="M0,89.0223L77,81.7015L154,54.3046L231,36.4685L308,56.0963L308,97.3939L231,76.7864L154,105.1463L77,126.9259L0,113.6444Z" fill="#306FAD" fill-opacity=".09"/></g>
+      <g class="f2-series" data-method="randopt"><path class="f2-curve" clip-path="url(#figure2-mobile-countdown-10-reveal)" d="M0,134.1176L77,119.9608L154,102.8235L231,95.3725L308,96.8627" stroke="#C76526" stroke-dasharray="7 4"/><g class="f2-point" data-n="25"><title>RandOpt: 30.00 ± 3.08% at N=25</title><rect x="-3.5" y="130.6176" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g><g class="f2-point" data-n="50"><title>RandOpt: 31.27 ± 2.39% at N=50</title><rect x="73.5" y="116.4608" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g><g class="f2-point" data-n="100"><title>RandOpt: 32.80 ± 1.04% at N=100</title><rect x="150.5" y="99.3235" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g><g class="f2-point" data-n="200"><title>RandOpt: 33.47 ± 1.22% at N=200</title><rect x="227.5" y="91.8725" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g><g class="f2-point" data-n="300"><title>RandOpt: 33.33 ± 1.21% at N=300</title><rect x="304.5" y="93.3627" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g></g><g class="f2-series" data-method="modular"><path class="f2-curve" clip-path="url(#figure2-mobile-countdown-10-reveal)" d="M0,101.3333L77,104.3137L154,79.7255L231,56.6275L308,76.7451" stroke="#306FAD" /><g class="f2-point" data-n="25"><title>Modular Norm RandOpt: 32.93 ± 1.10% at N=25</title><circle cx="0" cy="101.3333" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g><g class="f2-point" data-n="50"><title>Modular Norm RandOpt: 32.67 ± 2.02% at N=50</title><circle cx="77" cy="104.3137" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g><g class="f2-point" data-n="100"><title>Modular Norm RandOpt: 34.87 ± 2.27% at N=100</title><circle cx="154" cy="79.7255" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g><g class="f2-point" data-n="200"><title>Modular Norm RandOpt: 36.93 ± 1.80% at N=200</title><circle cx="231" cy="56.6275" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g><g class="f2-point" data-n="300"><title>Modular Norm RandOpt: 35.13 ± 1.85% at N=300</title><circle cx="308" cy="76.7451" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g></g>
+    </g>
+    <g class="f2-emphasis">
+      <text x="0" y="-44" text-anchor="start" class="f2-saving">3× fewer candidates</text>
+      <text x="0" y="-24" text-anchor="start" class="f2-note">MN N=100 vs RandOpt N=300 · +1.53 pt</text>
+      <rect x="300.75" y="89.6127" width="14.5" height="14.5" fill="none" stroke="#C76526" stroke-width="1.25"/>
+      <circle cx="154" cy="79.7255" r="7.5" fill="none" stroke="#306FAD" stroke-width="1.25"/>
+    </g>
+  </g></g><g class="figure2-row" data-row="countdown-25"><g class="f2-panel" data-panel="countdown-25" transform="translate(64 530)" style="--panel-delay:0ms">
+    <title>Countdown · K=25. 3× fewer candidates; mean accuracy difference +0.93 percentage points.</title>
+    <defs><clipPath id="figure2-mobile-countdown-25-reveal" clipPathUnits="userSpaceOnUse"><rect class="f2-sweep" x="-12" y="-12" width="332" height="214" style="transform-origin:-12px 0px"/></clipPath></defs>
+    <g class="f2-axes"><text x="0" y="-70" class="f2-panel-title">Countdown · K=25</text><path d="M0 190H308" class="f2-grid"/><text x="-13" y="194.5" text-anchor="end" class="f2-tick">25</text><path d="M0 134.1176H308" class="f2-grid"/><text x="-13" y="138.6176" text-anchor="end" class="f2-tick">30</text><path d="M0 78.2353H308" class="f2-grid"/><text x="-13" y="82.7353" text-anchor="end" class="f2-tick">35</text><path d="M0 22.3529H308" class="f2-grid"/><text x="-13" y="26.8529" text-anchor="end" class="f2-tick">40</text><path d="M0 0V190H308" class="f2-axis"/><path d="M0 190v5" class="f2-axis"/><text x="0" y="213" text-anchor="middle" class="f2-tick">25</text><path d="M77 190v5" class="f2-axis"/><text x="77" y="213" text-anchor="middle" class="f2-tick">50</text><path d="M154 190v5" class="f2-axis"/><text x="154" y="213" text-anchor="middle" class="f2-tick">100</text><path d="M231 190v5" class="f2-axis"/><text x="231" y="213" text-anchor="middle" class="f2-tick">200</text><path d="M308 190v5" class="f2-axis"/><text x="308" y="213" text-anchor="middle" class="f2-tick">300</text><text x="-44" y="95" text-anchor="middle" transform="rotate(-90 -44 95)" class="f2-label">Accuracy (%)</text><text x="154" y="242" text-anchor="middle" class="f2-label">Candidate population N</text></g>
+    <g class="f2-data">
+      <g class="f2-bands" clip-path="url(#figure2-mobile-countdown-25-reveal)"><path class="f2-band" data-method="randopt" d="M0,72.7507L77,68.3237L154,42.2453L231,42.8307L308,43.1765L308,71.5686L231,76.385L154,76.9704L77,103.0488L0,132.8963Z" fill="#C76526" fill-opacity=".09"/><path class="f2-band" data-method="modular" d="M0,120.1036L77,56.7208L154,10.9675L231,13.0223L308,15.7404L308,57.2792L231,37.6444L154,82.9148L77,98.2596L0,170.4846Z" fill="#306FAD" fill-opacity=".09"/></g>
+      <g class="f2-series" data-method="randopt"><path class="f2-curve" clip-path="url(#figure2-mobile-countdown-25-reveal)" d="M0,102.8235L77,85.6863L154,59.6078L231,59.6078L308,57.3725" stroke="#C76526" stroke-dasharray="7 4"/><g class="f2-point" data-n="25"><title>RandOpt: 32.80 ± 2.69% at N=25</title><rect x="-3.5" y="99.3235" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g><g class="f2-point" data-n="50"><title>RandOpt: 34.33 ± 1.55% at N=50</title><rect x="73.5" y="82.1863" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g><g class="f2-point" data-n="100"><title>RandOpt: 36.67 ± 1.55% at N=100</title><rect x="150.5" y="56.1078" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g><g class="f2-point" data-n="200"><title>RandOpt: 36.67 ± 1.50% at N=200</title><rect x="227.5" y="56.1078" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g><g class="f2-point" data-n="300"><title>RandOpt: 36.87 ± 1.27% at N=300</title><rect x="304.5" y="53.8725" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g></g><g class="f2-series" data-method="modular"><path class="f2-curve" clip-path="url(#figure2-mobile-countdown-25-reveal)" d="M0,145.2941L77,77.4902L154,46.9412L231,25.3333L308,36.5098" stroke="#306FAD" /><g class="f2-point" data-n="25"><title>Modular Norm RandOpt: 29.00 ± 2.25% at N=25</title><circle cx="0" cy="145.2941" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g><g class="f2-point" data-n="50"><title>Modular Norm RandOpt: 35.07 ± 1.86% at N=50</title><circle cx="77" cy="77.4902" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g><g class="f2-point" data-n="100"><title>Modular Norm RandOpt: 37.80 ± 3.22% at N=100</title><circle cx="154" cy="46.9412" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g><g class="f2-point" data-n="200"><title>Modular Norm RandOpt: 39.73 ± 1.10% at N=200</title><circle cx="231" cy="25.3333" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g><g class="f2-point" data-n="300"><title>Modular Norm RandOpt: 38.73 ± 1.86% at N=300</title><circle cx="308" cy="36.5098" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g></g>
+    </g>
+    <g class="f2-emphasis">
+      <text x="0" y="-44" text-anchor="start" class="f2-saving">3× fewer candidates</text>
+      <text x="0" y="-24" text-anchor="start" class="f2-note">MN N=100 vs RandOpt N=300 · +0.93 pt</text>
+      <rect x="300.75" y="50.1225" width="14.5" height="14.5" fill="none" stroke="#C76526" stroke-width="1.25"/>
+      <circle cx="154" cy="46.9412" r="7.5" fill="none" stroke="#306FAD" stroke-width="1.25"/>
+    </g>
+  </g></g>
+<g class="figure2-row" data-row="gsm8k-10"><g class="f2-panel" data-panel="gsm8k-10" transform="translate(64 900)" style="--panel-delay:0ms">
+    <title>GSM8K · K=10. ≥12× fewer candidates; mean accuracy difference +2.60 percentage points.</title>
+    <defs><clipPath id="figure2-mobile-gsm8k-10-reveal" clipPathUnits="userSpaceOnUse"><rect class="f2-sweep" x="-12" y="-12" width="332" height="214" style="transform-origin:-12px 0px"/></clipPath></defs>
+    <g class="f2-axes"><text x="0" y="-70" class="f2-panel-title">GSM8K · K=10</text><path d="M0 190H308" class="f2-grid"/><text x="-13" y="194.5" text-anchor="end" class="f2-tick">64</text><path d="M0 155.4545H308" class="f2-grid"/><text x="-13" y="159.9545" text-anchor="end" class="f2-tick">66</text><path d="M0 120.9091H308" class="f2-grid"/><text x="-13" y="125.4091" text-anchor="end" class="f2-tick">68</text><path d="M0 86.3636H308" class="f2-grid"/><text x="-13" y="90.8636" text-anchor="end" class="f2-tick">70</text><path d="M0 51.8182H308" class="f2-grid"/><text x="-13" y="56.3182" text-anchor="end" class="f2-tick">72</text><path d="M0 17.2727H308" class="f2-grid"/><text x="-13" y="21.7727" text-anchor="end" class="f2-tick">74</text><path d="M0 0V190H308" class="f2-axis"/><path d="M0 190v5" class="f2-axis"/><text x="0" y="213" text-anchor="middle" class="f2-tick">25</text><path d="M77 190v5" class="f2-axis"/><text x="77" y="213" text-anchor="middle" class="f2-tick">50</text><path d="M154 190v5" class="f2-axis"/><text x="154" y="213" text-anchor="middle" class="f2-tick">100</text><path d="M231 190v5" class="f2-axis"/><text x="231" y="213" text-anchor="middle" class="f2-tick">200</text><path d="M308 190v5" class="f2-axis"/><text x="308" y="213" text-anchor="middle" class="f2-tick">300</text><text x="-44" y="95" text-anchor="middle" transform="rotate(-90 -44 95)" class="f2-label">Accuracy (%)</text><text x="154" y="242" text-anchor="middle" class="f2-label">Candidate population N</text></g>
+    <g class="f2-data">
+      <g class="f2-bands" clip-path="url(#figure2-mobile-gsm8k-10-reveal)"><path class="f2-band" data-method="randopt" d="M0,135.2092L77,122.1139L154,118.6436L231,94.6137L308,90.6772L308,138.7092L231,141.7568L154,153.5208L77,161.3998L0,153.5426Z" fill="#C76526" fill-opacity=".09"/><path class="f2-band" data-method="modular" d="M0,55.1502L77,57.339L154,52.6105L231,44.8515L308,32.341L308,39.9016L231,55.3277L154,79.8705L77,66.4117L0,84.3149Z" fill="#306FAD" fill-opacity=".09"/></g>
+      <g class="f2-series" data-method="randopt"><path class="f2-curve" clip-path="url(#figure2-mobile-gsm8k-10-reveal)" d="M0,144.3759L77,141.7568L154,136.0822L231,118.1853L308,114.6932" stroke="#C76526" stroke-dasharray="7 4"/><g class="f2-point" data-n="25"><title>RandOpt: 66.64 ± 0.53% at N=25</title><rect x="-3.5" y="140.8759" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g><g class="f2-point" data-n="50"><title>RandOpt: 66.79 ± 1.14% at N=50</title><rect x="73.5" y="138.2568" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g><g class="f2-point" data-n="100"><title>RandOpt: 67.12 ± 1.01% at N=100</title><rect x="150.5" y="132.5822" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g><g class="f2-point" data-n="200"><title>RandOpt: 68.16 ± 1.36% at N=200</title><rect x="227.5" y="114.6853" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g><g class="f2-point" data-n="300"><title>RandOpt: 68.36 ± 1.39% at N=300</title><rect x="304.5" y="111.1932" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g></g><g class="f2-series" data-method="modular"><path class="f2-curve" clip-path="url(#figure2-mobile-gsm8k-10-reveal)" d="M0,69.7326L77,61.8754L154,66.2405L231,50.0896L308,36.1213" stroke="#306FAD" /><g class="f2-point" data-n="25"><title>Modular Norm RandOpt: 70.96 ± 0.84% at N=25</title><circle cx="0" cy="69.7326" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g><g class="f2-point" data-n="50"><title>Modular Norm RandOpt: 71.42 ± 0.26% at N=50</title><circle cx="77" cy="61.8754" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g><g class="f2-point" data-n="100"><title>Modular Norm RandOpt: 71.17 ± 0.79% at N=100</title><circle cx="154" cy="66.2405" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g><g class="f2-point" data-n="200"><title>Modular Norm RandOpt: 72.10 ± 0.30% at N=200</title><circle cx="231" cy="50.0896" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g><g class="f2-point" data-n="300"><title>Modular Norm RandOpt: 72.91 ± 0.22% at N=300</title><circle cx="308" cy="36.1213" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g></g>
+    </g>
+    <g class="f2-emphasis">
+      <text x="0" y="-44" text-anchor="start" class="f2-saving">≥12× fewer candidates</text>
+      <text x="0" y="-24" text-anchor="start" class="f2-note">MN N=25 vs RandOpt N=300 · +2.60 pt</text>
+      <rect x="300.75" y="107.4432" width="14.5" height="14.5" fill="none" stroke="#C76526" stroke-width="1.25"/>
+      <circle cx="0" cy="69.7326" r="7.5" fill="none" stroke="#306FAD" stroke-width="1.25"/>
+    </g>
+  </g></g><g class="figure2-row" data-row="gsm8k-25"><g class="f2-panel" data-panel="gsm8k-25" transform="translate(64 1270)" style="--panel-delay:0ms">
+    <title>GSM8K · K=25. ≥12× fewer candidates; mean accuracy difference +3.11 percentage points.</title>
+    <defs><clipPath id="figure2-mobile-gsm8k-25-reveal" clipPathUnits="userSpaceOnUse"><rect class="f2-sweep" x="-12" y="-12" width="332" height="214" style="transform-origin:-12px 0px"/></clipPath></defs>
+    <g class="f2-axes"><text x="0" y="-70" class="f2-panel-title">GSM8K · K=25</text><path d="M0 190H308" class="f2-grid"/><text x="-13" y="194.5" text-anchor="end" class="f2-tick">64</text><path d="M0 155.4545H308" class="f2-grid"/><text x="-13" y="159.9545" text-anchor="end" class="f2-tick">66</text><path d="M0 120.9091H308" class="f2-grid"/><text x="-13" y="125.4091" text-anchor="end" class="f2-tick">68</text><path d="M0 86.3636H308" class="f2-grid"/><text x="-13" y="90.8636" text-anchor="end" class="f2-tick">70</text><path d="M0 51.8182H308" class="f2-grid"/><text x="-13" y="56.3182" text-anchor="end" class="f2-tick">72</text><path d="M0 17.2727H308" class="f2-grid"/><text x="-13" y="21.7727" text-anchor="end" class="f2-tick">74</text><path d="M0 0V190H308" class="f2-axis"/><path d="M0 190v5" class="f2-axis"/><text x="0" y="213" text-anchor="middle" class="f2-tick">25</text><path d="M77 190v5" class="f2-axis"/><text x="77" y="213" text-anchor="middle" class="f2-tick">50</text><path d="M154 190v5" class="f2-axis"/><text x="154" y="213" text-anchor="middle" class="f2-tick">100</text><path d="M231 190v5" class="f2-axis"/><text x="231" y="213" text-anchor="middle" class="f2-tick">200</text><path d="M308 190v5" class="f2-axis"/><text x="308" y="213" text-anchor="middle" class="f2-tick">300</text><text x="-44" y="95" text-anchor="middle" transform="rotate(-90 -44 95)" class="f2-label">Accuracy (%)</text><text x="154" y="242" text-anchor="middle" class="f2-label">Candidate population N</text></g>
+    <g class="f2-data">
+      <g class="f2-bands" clip-path="url(#figure2-mobile-gsm8k-25-reveal)"><path class="f2-band" data-method="randopt" d="M0,135.9856L77,120.1539L154,108.5548L231,99.1544L308,98.3473L308,124.9279L231,129.3589L154,129.5618L77,131.058L0,159.7504Z" fill="#C76526" fill-opacity=".09"/><path class="f2-band" data-method="modular" d="M0,55.3277L77,31.8383L154,20.3399L231,19.2404L308,19.41L308,37.9912L231,36.4147L154,43.1724L77,52.6265L0,60.5659Z" fill="#306FAD" fill-opacity=".09"/></g>
+      <g class="f2-series" data-method="randopt"><path class="f2-curve" clip-path="url(#figure2-mobile-gsm8k-25-reveal)" d="M0,147.868L77,125.6059L154,119.0583L231,114.2567L308,111.6376" stroke="#C76526" stroke-dasharray="7 4"/><g class="f2-point" data-n="25"><title>RandOpt: 66.44 ± 0.69% at N=25</title><rect x="-3.5" y="144.368" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g><g class="f2-point" data-n="50"><title>RandOpt: 67.73 ± 0.32% at N=50</title><rect x="73.5" y="122.1059" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g><g class="f2-point" data-n="100"><title>RandOpt: 68.11 ± 0.61% at N=100</title><rect x="150.5" y="115.5583" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g><g class="f2-point" data-n="200"><title>RandOpt: 68.39 ± 0.87% at N=200</title><rect x="227.5" y="110.7567" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g><g class="f2-point" data-n="300"><title>RandOpt: 68.54 ± 0.77% at N=300</title><rect x="304.5" y="108.1376" width="7" height="7" fill="#ffffff" stroke="#C76526" stroke-width="1.8"/></g></g><g class="f2-series" data-method="modular"><path class="f2-curve" clip-path="url(#figure2-mobile-gsm8k-25-reveal)" d="M0,57.9468L77,42.2324L154,31.7562L231,27.8276L308,28.7006" stroke="#306FAD" /><g class="f2-point" data-n="25"><title>Modular Norm RandOpt: 71.65 ± 0.15% at N=25</title><circle cx="0" cy="57.9468" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g><g class="f2-point" data-n="50"><title>Modular Norm RandOpt: 72.55 ± 0.60% at N=50</title><circle cx="77" cy="42.2324" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g><g class="f2-point" data-n="100"><title>Modular Norm RandOpt: 73.16 ± 0.66% at N=100</title><circle cx="154" cy="31.7562" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g><g class="f2-point" data-n="200"><title>Modular Norm RandOpt: 73.39 ± 0.50% at N=200</title><circle cx="231" cy="27.8276" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g><g class="f2-point" data-n="300"><title>Modular Norm RandOpt: 73.34 ± 0.54% at N=300</title><circle cx="308" cy="28.7006" r="3.9" fill="#306FAD" stroke="#306FAD" stroke-width="1.8"/></g></g>
+    </g>
+    <g class="f2-emphasis">
+      <text x="0" y="-44" text-anchor="start" class="f2-saving">≥12× fewer candidates</text>
+      <text x="0" y="-24" text-anchor="start" class="f2-note">MN N=25 vs RandOpt N=300 · +3.11 pt</text>
+      <rect x="300.75" y="104.3876" width="14.5" height="14.5" fill="none" stroke="#C76526" stroke-width="1.25"/>
+      <circle cx="0" cy="57.9468" r="7.5" fill="none" stroke="#306FAD" stroke-width="1.25"/>
+    </g>
+  </g></g>
+
 </svg></div>
     <figcaption>Mean ± sample SD over 3 seeds. Each N uses a nested prefix of the same 300 candidates per run.<br>Candidate counts are equally spaced on the x-axis. Highlighted comparisons are differences in mean accuracy.</figcaption>
   </figure>

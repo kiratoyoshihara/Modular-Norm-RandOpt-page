@@ -39,22 +39,28 @@ assert.equal(figure2Y(42, [25, 42]), 0);
 
 const { JSDOM } = createRequire(resolve(root, '.local/verification/package.json'))('jsdom');
 const svg = renderFigure2(data);
+const mobileSvg = renderFigure2(data, 'figure2-mobile', { compact: true });
 assert.equal(await readFile(resolve(root, 'assets/figures/figure2.svg'), 'utf8'), svg);
+assert.equal(await readFile(resolve(root, 'assets/figures/figure2-mobile.svg'), 'utf8'), mobileSvg);
 const html = await readFile(resolve(root, 'index.html'), 'utf8');
 assert.ok(html.includes(svg), 'Page and standalone SVG use identical data');
+assert.ok(html.includes(mobileSvg), 'The mobile fallback uses the same scientific data');
 const dom = new JSDOM(html, { pretendToBeVisual: true });
 globalThis.window = dom.window;
 globalThis.document = window.document;
 document.documentElement.dataset.motion = 'running';
 const figure = document.querySelector('#figure2');
-assert.equal(figure.querySelectorAll('.f2-panel').length, 4);
-assert.equal(figure.querySelectorAll('.f2-curve').length, 8);
-assert.equal(figure.querySelectorAll('.f2-band').length, 8);
-assert.equal(figure.querySelectorAll('.f2-point').length, 40);
-assert.deepEqual([...figure.querySelectorAll('.f2-panel')].map((panel) => panel.dataset.panel), ['countdown-10', 'countdown-25', 'gsm8k-10', 'gsm8k-25']);
-for (const task of FIGURE2.tasks) {
-  assert.equal(figure.querySelectorAll(`[data-panel='${task.id}-10'] .f2-tick`).length, task.ticks.length + 5);
-  assert.equal(figure.querySelectorAll(`[data-panel='${task.id}-25'] .f2-tick`).length, 5);
+for (const diagram of figure.querySelectorAll('.figure2-svg')) {
+  const compact = diagram.classList.contains('figure2-svg-mobile');
+  assert.equal(diagram.querySelectorAll('.f2-panel').length, 4);
+  assert.equal(diagram.querySelectorAll('.f2-curve').length, 8);
+  assert.equal(diagram.querySelectorAll('.f2-band').length, 8);
+  assert.equal(diagram.querySelectorAll('.f2-point').length, 40);
+  assert.deepEqual([...diagram.querySelectorAll('.f2-panel')].map((panel) => panel.dataset.panel), ['countdown-10', 'countdown-25', 'gsm8k-10', 'gsm8k-25']);
+  for (const task of FIGURE2.tasks) {
+    assert.equal(diagram.querySelectorAll(`[data-panel='${task.id}-10'] .f2-tick`).length, task.ticks.length + 5);
+    assert.equal(diagram.querySelectorAll(`[data-panel='${task.id}-25'] .f2-tick`).length, (compact ? task.ticks.length : 0) + 5);
+  }
 }
 assert.ok([...figure.querySelectorAll('.f2-band')].every((band) => band.getAttribute('fill-opacity') === '.09'));
 assert.ok([...figure.querySelectorAll('.f2-emphasis')].every((group) => group.querySelectorAll('circle,rect').length === 2));
@@ -69,8 +75,11 @@ class Observer {
 }
 window.IntersectionObserver = Observer;
 const chart = new Figure2Chart(figure);
-const [top, bottom] = chart.rows;
-const state = () => chart.rows.map((row) => row.dataset.reveal);
+const [top, bottom, ...mobilePanels] = chart.rows;
+const state = () => [top, bottom].map((row) => row.dataset.reveal);
+assert.equal(mobilePanels.length, 4, 'Each mobile panel animates independently as it enters the viewport');
+chart.observer.emit(mobilePanels[0], .5);
+assert.deepEqual(mobilePanels.map(panel => panel.dataset.reveal), ['playing', 'waiting', 'waiting', 'waiting']);
 assert.deepEqual(state(), ['waiting', 'waiting']);
 chart.observer.emit(top, .1);
 assert.deepEqual(state(), ['waiting', 'waiting']);

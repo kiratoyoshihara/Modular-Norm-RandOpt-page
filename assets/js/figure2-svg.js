@@ -29,7 +29,8 @@ export function figure2Data(csv) {
   });
 }
 
-export function figure2Panel(taskIndex, column) {
+export function figure2Panel(taskIndex, column, compact = false) {
+  if (compact) return { x: 64, y: 160 + (taskIndex * 2 + column) * 370, width: 308, height: 190 };
   return { x: column === 0 ? 82 : 640, y: taskIndex === 0 ? 122 : 440, width: 448, height: 220 };
 }
 
@@ -50,9 +51,11 @@ function marker(method, x, y, outer = false) {
   return `<rect x="${number(x - size / 2)}" y="${number(y - size / 2)}" width="${size}" height="${size}" fill="${outer ? 'none' : '#ffffff'}" ${attrs}/>`;
 }
 
-function panelSVG(data, task, taskIndex, column, prefix) {
+function panelSVG(data, task, taskIndex, column, prefix, compact = false) {
   const k = [10, 25][column];
-  const panel = figure2Panel(taskIndex, column);
+  const panel = figure2Panel(taskIndex, column, compact);
+  const xAt = n => figure2X(n, panel.width);
+  const yAt = value => figure2Y(value, task.domain, panel.height);
   const key = `${task.id}-${k}`;
   const rows = data.filter((row) => row.task === task.id && row.k === k);
   const series = FIGURE2.methods.map((method) => {
@@ -61,10 +64,10 @@ function panelSVG(data, task, taskIndex, column, prefix) {
       if (found.length !== 1) throw new Error(`Missing or duplicate Figure 2 point: ${key}/${method.id}/${n}`);
       return found[0];
     });
-    const points = values.map((value) => [figure2X(value.n), figure2Y(value.mean, task.domain)]);
+    const points = values.map((value) => [xAt(value.n), yAt(value.mean)]);
     const band = [
-      ...values.map((value) => [figure2X(value.n), figure2Y(value.upper, task.domain)]),
-      ...values.toReversed().map((value) => [figure2X(value.n), figure2Y(value.lower, task.domain)]),
+      ...values.map((value) => [xAt(value.n), yAt(value.upper)]),
+      ...values.toReversed().map((value) => [xAt(value.n), yAt(value.lower)]),
     ];
     return { method, values, points, band };
   });
@@ -72,36 +75,36 @@ function panelSVG(data, task, taskIndex, column, prefix) {
   const modular = rows.find((row) => row.method === 'modular' && row.n === task.selectedN);
   const difference = (modular.mean - baseline.mean).toFixed(2);
   const ticks = task.ticks.map((tick) => {
-    const y = number(figure2Y(tick, task.domain));
-    return `<path d="M0 ${y}H${panel.width}" class="f2-grid"/>${column === 0 ? `<text x="-13" y="${y + 4.5}" text-anchor="end" class="f2-tick">${tick}</text>` : ''}`;
+    const y = number(yAt(tick));
+    return `<path d="M0 ${y}H${panel.width}" class="f2-grid"/>${compact || column === 0 ? `<text x="-13" y="${y + 4.5}" text-anchor="end" class="f2-tick">${tick}</text>` : ''}`;
   }).join('');
   const xTicks = FIGURE2.populations.map((n) => {
-    const x = figure2X(n);
+    const x = xAt(n);
     return `<path d="M${x} ${panel.height}v5" class="f2-axis"/><text x="${x}" y="${panel.height + 23}" text-anchor="middle" class="f2-tick">${n}</text>`;
   }).join('');
   const title = `${task.name} · K=${k}`;
-  const note = `Modular Norm RandOpt N=${task.selectedN} vs RandOpt N=300 · +${difference} pt`;
-  return `<g class="f2-panel" data-panel="${key}" transform="translate(${panel.x} ${panel.y})" style="--panel-delay:${column * 160}ms">
+  const note = `${compact ? 'MN' : 'Modular Norm RandOpt'} N=${task.selectedN} vs RandOpt N=300 · +${difference} pt`;
+  return `<g class="f2-panel" data-panel="${key}" transform="translate(${panel.x} ${panel.y})" style="--panel-delay:${compact ? 0 : column * 160}ms">
     <title>${title}. ${task.saving} fewer candidates; mean accuracy difference +${difference} percentage points.</title>
-    <defs><clipPath id="${prefix}-${key}-reveal" clipPathUnits="userSpaceOnUse"><rect class="f2-sweep" x="-12" y="-12" width="472" height="244" style="transform-origin:-12px 0px"/></clipPath></defs>
-    <g class="f2-axes"><text x="0" y="-47" class="f2-panel-title">${title}</text>${ticks}<path d="M0 0V${panel.height}H${panel.width}" class="f2-axis"/>${xTicks}</g>
+    <defs><clipPath id="${prefix}-${key}-reveal" clipPathUnits="userSpaceOnUse"><rect class="f2-sweep" x="-12" y="-12" width="${panel.width + 24}" height="${panel.height + 24}" style="transform-origin:-12px 0px"/></clipPath></defs>
+    <g class="f2-axes"><text x="0" y="${compact ? -70 : -47}" class="f2-panel-title">${title}</text>${ticks}<path d="M0 0V${panel.height}H${panel.width}" class="f2-axis"/>${xTicks}${compact ? `<text x="-44" y="${panel.height / 2}" text-anchor="middle" transform="rotate(-90 -44 ${panel.height / 2})" class="f2-label">Accuracy (%)</text><text x="${panel.width / 2}" y="${panel.height + 52}" text-anchor="middle" class="f2-label">Candidate population N</text>` : ''}</g>
     <g class="f2-data">
       <g class="f2-bands" clip-path="url(#${prefix}-${key}-reveal)">${series.map(({ method, band }) => `<path class="f2-band" data-method="${method.id}" d="${path(band, true)}" fill="${method.color}" fill-opacity=".09"/>`).join('')}</g>
       ${series.map(({ method, values, points }) => `<g class="f2-series" data-method="${method.id}"><path class="f2-curve" clip-path="url(#${prefix}-${key}-reveal)" d="${path(points)}" stroke="${method.color}" ${method.id === 'randopt' ? 'stroke-dasharray="7 4"' : ''}/>${points.map(([x,y], i) => `<g class="f2-point" data-n="${values[i].n}"><title>${esc(method.name)}: ${values[i].mean.toFixed(2)} ± ${values[i].sd.toFixed(2)}% at N=${values[i].n}</title>${marker(method, x, y)}</g>`).join('')}</g>`).join('')}
     </g>
     <g class="f2-emphasis">
-      <text x="${panel.width}" y="-47" text-anchor="end" class="f2-saving">${task.saving} fewer candidates</text>
-      <text x="${panel.width}" y="-24" text-anchor="end" class="f2-note">${esc(note)}</text>
-      ${marker(FIGURE2.methods[0], figure2X(300), figure2Y(baseline.mean, task.domain), true)}
-      ${marker(FIGURE2.methods[1], figure2X(task.selectedN), figure2Y(modular.mean, task.domain), true)}
+      <text x="${compact ? 0 : panel.width}" y="${compact ? -44 : -47}" text-anchor="${compact ? 'start' : 'end'}" class="f2-saving">${task.saving} fewer candidates</text>
+      <text x="${compact ? 0 : panel.width}" y="-24" text-anchor="${compact ? 'start' : 'end'}" class="f2-note">${esc(note)}</text>
+      ${marker(FIGURE2.methods[0], xAt(300), yAt(baseline.mean), true)}
+      ${marker(FIGURE2.methods[1], xAt(task.selectedN), yAt(modular.mean), true)}
     </g>
   </g>`;
 }
 
-export function renderFigure2(data, id = 'figure2') {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${FIGURE2.width} ${FIGURE2.height}" class="figure2-svg" role="img" aria-labelledby="${id}-title ${id}-description">
+export function renderFigure2(data, id = 'figure2', { compact = false } = {}) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${compact ? '400 1532' : `${FIGURE2.width} ${FIGURE2.height}`}" class="figure2-svg figure2-svg-${compact ? 'mobile' : 'desktop'}" role="img" aria-labelledby="${id}-title ${id}-description">
   <title id="${id}-title">Population scaling on Countdown and GSM8K</title>
-  <desc id="${id}-description">Qwen2.5-1.5B-Instruct. Four panels: Countdown above GSM8K; K=10 on the left and K=25 on the right. Population sizes 25, 50, 100, 200, 300 are equally spaced categories. Curves show means; shaded bands show one sample standard deviation across seeds 42, 43, 44. Modular Norm RandOpt at N=100 exceeds RandOpt at N=300 on Countdown by 1.53 and 0.93 percentage points; at N=25 it exceeds RandOpt at N=300 on GSM8K by 2.60 and 3.11 points. These are comparisons of means, not statistical significance claims. Populations are nested prefixes of the same 300 candidates per run.</desc>
+  <desc id="${id}-description">Qwen2.5-1.5B-Instruct. ${compact ? 'Four panels in one column: Countdown K=10, Countdown K=25, GSM8K K=10, GSM8K K=25.' : 'Four panels: Countdown above GSM8K; K=10 on the left and K=25 on the right.'} Population sizes 25, 50, 100, 200, 300 are equally spaced categories. Curves show means; shaded bands show one sample standard deviation across seeds 42, 43, 44. Modular Norm RandOpt at N=100 exceeds RandOpt at N=300 on Countdown by 1.53 and 0.93 percentage points; at N=25 it exceeds RandOpt at N=300 on GSM8K by 2.60 and 3.11 points. These are comparisons of means, not statistical significance claims. Populations are nested prefixes of the same 300 candidates per run.</desc>
   <style>
     .figure2-svg{font-family:Inter,Arial,Helvetica,sans-serif;background:#fff}
     .f2-axis{fill:none;stroke:#8d96a1;stroke-width:1}
@@ -113,10 +116,18 @@ export function renderFigure2(data, id = 'figure2') {
     .f2-label{font-size:17px;font-weight:550;fill:#272d35}
     .f2-curve{fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
     .f2-legend{font-size:14px;font-weight:550}
+    .figure2-svg-mobile .f2-tick{font-size:15px}
+    .figure2-svg-mobile .f2-panel-title{font-size:20px}
+    .figure2-svg-mobile .f2-saving{font-size:18px}
+    .figure2-svg-mobile .f2-note{font-size:13px}
+    .figure2-svg-mobile .f2-label{font-size:15px}
+    .figure2-svg-mobile .f2-legend{font-size:17px}
   </style>
-  <g class="f2-legend" transform="translate(360 26)"><path d="M0 0H30" stroke="#C76526" stroke-width="2.4" stroke-dasharray="7 4"/>${marker(FIGURE2.methods[0],15,0)}<text x="42" y="4.5" fill="#C76526">RandOpt</text><path d="M150 0H180" stroke="#306FAD" stroke-width="2.4"/>${marker(FIGURE2.methods[1],165,0)}<text x="192" y="4.5" fill="#306FAD">Modular Norm RandOpt</text></g>
-  <text x="19" y="384" class="f2-label" text-anchor="middle" transform="rotate(-90 19 384)">Ensemble accuracy (%)</text>
-  ${FIGURE2.tasks.map((task, row) => `<g class="figure2-row" data-row="${task.id}">${[0,1].map((column) => panelSVG(data,task,row,column,id)).join('')}</g>`).join('\n')}
-  <text x="584" y="719" text-anchor="middle" class="f2-label">Candidate population size N</text>
+  <g class="f2-legend" transform="translate(${compact ? '60 22' : '360 26'})"><path d="M0 0H30" stroke="#C76526" stroke-width="2.4" stroke-dasharray="7 4"/>${marker(FIGURE2.methods[0],15,0)}<text x="42" y="4.5" fill="#C76526">RandOpt</text><g transform="translate(${compact ? '0 29' : '150 0'})"><path d="M0 0H30" stroke="#306FAD" stroke-width="2.4"/>${marker(FIGURE2.methods[1],15,0)}<text x="42" y="4.5" fill="#306FAD">Modular Norm RandOpt</text></g></g>
+${compact ? '' : '  <text x="19" y="384" class="f2-label" text-anchor="middle" transform="rotate(-90 19 384)">Ensemble accuracy (%)</text>'}
+  ${FIGURE2.tasks.map((task, row) => compact
+    ? [0,1].map(column => `<g class="figure2-row" data-row="${task.id}-${[10,25][column]}">${panelSVG(data,task,row,column,id,true)}</g>`).join('')
+    : `<g class="figure2-row" data-row="${task.id}">${[0,1].map(column => panelSVG(data,task,row,column,id)).join('')}</g>`).join('\n')}
+${compact ? '' : '  <text x="584" y="719" text-anchor="middle" class="f2-label">Candidate population size N</text>'}
 </svg>`;
 }

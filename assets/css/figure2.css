@@ -7,8 +7,9 @@
 .figure2-replay:hover { color: #161616; }
 .figure2-replay:disabled { color: #aaa; cursor: default; }
 .figure2-replay svg { width: 13px; height: 13px; }
-.figure2-scroll { overflow-x: auto; scrollbar-width: thin; scrollbar-color: #c7c7c7 #fff; }
+.figure2-scroll { min-width: 0; }
 .figure2-svg { display: block; width: 100%; height: auto; background: #ffffff; }
+.figure2-svg-mobile { display: none; }
 .figure2 figcaption { margin: 21px auto 0; max-width: 800px; text-align: center; font-size: 10px; color: #838383; line-height: 1.8; }
 .figure2-section + .results-section { padding-top: 64px; border-top: 1px solid #e5e5e5; }
 
@@ -30,11 +31,12 @@
 @keyframes figure2-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes figure2-rise { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes figure2-draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (max-width: 900px) {
+  .figure2-svg-desktop { display: none; }
+  .figure2-svg-mobile { display: block; max-width: 440px; margin-inline: auto; }
+}
 @media (max-width: 760px) {
   .figure2-section { padding: 54px 20px 46px; }
-  /* Keep the paper's 2 × 2 arrangement and readable labels on narrow screens. */
-  .figure2-svg { min-width: 760px; }
-  .figure2-scroll { padding-bottom: 8px; }
   .figure2-section + .results-section { padding-top: 48px; }
   .figure2 figcaption { font-size: 9px; text-align: left; }
 }

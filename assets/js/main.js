@@ -2,7 +2,7 @@ import { RadarChart } from './radar-chart.js';
 import { Figure2Chart } from './figure2-chart.js';
 import { SectionNav } from './section-nav.js';
 import { IterativeChart } from './iterative-chart.js';
-import { MethodAnimation } from './method-animation.js?v=indexed-colors-1';
+import { MethodAnimation } from './method-animation.js?v=mobile-layout-1';
 
 const sectionNav = document.querySelector('.section-nav');
 if (sectionNav) new SectionNav(sectionNav);

@@ -41,7 +41,7 @@ for (const reducedOnLoad of [false, true]) {
     assert.equal(method.dataset.enhanced,'true');
     assert.equal(method.querySelector('[data-method-replay]').disabled,reducedOnLoad);
     const rows = [...document.querySelectorAll('.figure2-row')];
-    assert.equal(rows.length, 4, 'Both Figure 2 rows and iterative panels initialize');
+    assert.equal(rows.length, 8, 'Desktop rows, mobile population panels, and iterative panels initialize');
     const radar = document.querySelector('#radar-mount');
     const charts = [...rows, radar];
     const replay = [...document.querySelectorAll('[data-figure2-replay], [data-radar-replay]')];

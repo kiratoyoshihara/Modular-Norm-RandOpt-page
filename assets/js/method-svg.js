@@ -8,7 +8,11 @@ export const METHOD_STEPS = [
 
 export const METHOD_SELECTED = [3, 5, 7];
 export const METHOD_CANDIDATE_COUNT = 9;
+// End the mobile viewport just below the last revealed step.
+export const METHOD_MOBILE_HEIGHTS = [204, 444, 704, 780, 1105];
 const CANDIDATE_ROW_SPACING = 60;
+export const methodMobileHeight = (phase, draw = METHOD_CANDIDATE_COUNT) => METHOD_MOBILE_HEIGHTS[phase]
+  - (phase === 2 ? (Math.ceil(METHOD_CANDIDATE_COUNT / 3) - Math.ceil(draw / 3)) * CANDIDATE_ROW_SPACING : 0);
 const VOTER_SPACING = 141 / (METHOD_SELECTED.length - 1);
 const TRANSFER_SPEED = 1.15 * 1.1;
 const SAMPLE_TRAVEL = Math.round(800 / TRANSFER_SPEED);

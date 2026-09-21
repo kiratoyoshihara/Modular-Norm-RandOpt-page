@@ -1,8 +1,9 @@
-import { METHOD_STEPS, METHOD_CANDIDATE_COUNT, METHOD_SELECTED, methodStepDuration, matrixFills } from './method-svg.js?v=indexed-colors-1';
+import { METHOD_STEPS, METHOD_CANDIDATE_COUNT, METHOD_SELECTED, methodMobileHeight, methodStepDuration, matrixFills } from './method-svg.js?v=mobile-layout-1';
 
 export class MethodAnimation {
   constructor(root) {
     this.root = root;
+    this.mobileDiagram = root.querySelector('.method-diagram-mobile');
     this.stages = [...root.querySelectorAll('[data-method-stage]')];
     this.steps = [...root.querySelectorAll('[data-method-step]')];
     this.toggle = root.querySelector('[data-method-toggle]');
@@ -115,6 +116,8 @@ export class MethodAnimation {
   sync() {
     const disabled = this.preference.matches || this.globalPaused;
     this.root.dataset.reduced = String(disabled);
+    const mobileHeight = methodMobileHeight(disabled || this.complete ? METHOD_STEPS.length - 1 : this.phase, this.draw);
+    this.mobileDiagram.setAttribute('viewBox', `0 0 320 ${mobileHeight}`);
     this.root.querySelectorAll('[data-method-index]').forEach(label => { label.textContent = disabled ? 'i' : String(this.draw); });
     this.root.querySelector('[data-method-progress]').textContent = disabled
       ? `Repeat independently for i = 1, …, ${METHOD_CANDIDATE_COUNT}`

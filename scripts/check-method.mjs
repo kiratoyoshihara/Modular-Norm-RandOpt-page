@@ -54,6 +54,8 @@ for (const reduced of [false, true]) {
   }
   assert.equal(figure.dataset.enhanced,undefined,'All five steps are available before JavaScript enhancement');
   const animation = new MethodAnimation(figure);
+  const mobileHeight = () => Number(figure.querySelector('.method-diagram-mobile').getAttribute('viewBox').split(' ')[3]);
+  assert.equal(mobileHeight(), reduced ? 1105 : 204, 'Mobile reserves space only for revealed steps; reduced motion shows the full method');
   const diagram = figure.querySelector('.method-diagram-desktop');
   const fills = selector => [...diagram.querySelectorAll(`${selector} .method-matrix-cell`)].map(cell=>cell.getAttribute('fill'));
   const pattern = colors => colors.map(color=>colors.indexOf(color));
@@ -89,12 +91,14 @@ for (const reduced of [false, true]) {
     assert.equal(animation.phase,0,'Resume preserves elapsed stage time');
     advance(1);
     assert.equal(animation.phase,1);
+    assert.equal(mobileHeight(),444);
     observer.emit(false);
     advance(5000);
     assert.equal(animation.phase,1,'Offscreen playback is paused');
     observer.emit(true);
     advance(METHOD_DURATIONS[1]);
     assert.equal(animation.phase,2);
+    assert.equal(mobileHeight(),584, 'Unfilled candidate rows do not reserve blank space');
     Object.defineProperty(document,'hidden',{configurable:true,value:true});
     document.dispatchEvent(new window.Event('visibilitychange'));
     advance(5000);
