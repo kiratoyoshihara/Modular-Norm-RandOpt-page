@@ -1,6 +1,6 @@
 // Export the existing method illustration with its original CSS animation timing.
 // Requires ffmpeg and Playwright (project-local or in .local/verification).
-// Run: node scripts/export-method-gif.mjs [output.gif]
+// Run: node scripts/export-method-gif.mjs [output.gif] [pixel-scale]
 import { createServer } from 'node:http';
 import { mkdir, readFile, stat } from 'node:fs/promises';
 import { createRequire } from 'node:module';
@@ -17,7 +17,9 @@ try {
   ({ chromium } = createRequire(resolve(root, '.local/verification/package.json'))('playwright'));
 }
 const output = resolve(root, process.argv[2] || 'assets/animations/modular-norm-randopt.gif');
-const frames = resolve(root, '.local/method-gif-frames');
+const pixelScale = Number(process.argv[3] || 1);
+if (!Number.isInteger(pixelScale) || pixelScale < 1) throw new Error('Pixel scale must be a positive integer.');
+const frames = resolve(root, `.local/method-gif-frames-${pixelScale}x`);
 const fps = 20;
 const width = 1440;
 const hold = 1600;
@@ -107,14 +109,14 @@ await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 let browser;
 try {
   browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width, height: 800 }, deviceScaleFactor: 1, reducedMotion: 'no-preference' });
+  const page = await browser.newPage({ viewport: { width, height: 800 }, deviceScaleFactor: pixelScale, reducedMotion: 'no-preference' });
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(`http://127.0.0.1:${server.address().port}/__method-gif__`);
   await page.waitForFunction(() => window.exportReady);
   const height = await page.evaluate(() => Math.ceil(document.querySelector('.method-animation').getBoundingClientRect().bottom + 36));
   await page.setViewportSize({ width, height });
-  console.log(`Rendering ${frameCount} frames at ${width} × ${height}, ${fps} fps.`);
+  console.log(`Rendering ${frameCount} frames at ${width * pixelScale} × ${height * pixelScale}, ${fps} fps.`);
   for (let frame = 0; frame < frameCount; frame++) {
     await page.evaluate(time => window.seekMethod(time), frame * 1000 / fps);
     await page.screenshot({ path: resolve(frames, `frame-${String(frame).padStart(4, '0')}.png`), animations: 'allow' });
@@ -135,12 +137,22 @@ try {
   await new Promise(resolve => server.close(resolve));
 }
 
-const encoded = spawnSync('ffmpeg', [
-  '-hide_banner', '-loglevel', 'error', '-y', '-framerate', String(fps),
-  '-i', resolve(frames, 'frame-%04d.png'), '-frames:v', String(frameCount),
-  '-filter_complex', '[0:v]split[a][b];[a]palettegen=stats_mode=diff[p];[b][p]paletteuse=dither=sierra2_4a:diff_mode=rectangle',
+// Generate the palette in a separate pass so high-resolution frames are not
+// all buffered in memory while the palette is being calculated.
+const palette = resolve(frames, 'palette.png');
+const ffmpeg = args => {
+  const result = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', ...args], { stdio: 'inherit' });
+  if (result.error) throw result.error;
+  if (result.status !== 0) throw new Error(`ffmpeg exited with status ${result.status}`);
+};
+ffmpeg([
+  '-framerate', String(fps), '-i', resolve(frames, 'frame-%04d.png'),
+  '-t', String(frameCount / fps), '-vf', 'palettegen=stats_mode=diff',
+  '-frames:v', '1', '-update', '1', palette,
+]);
+ffmpeg([
+  '-framerate', String(fps), '-i', resolve(frames, 'frame-%04d.png'), '-i', palette,
+  '-frames:v', String(frameCount), '-filter_complex', '[0:v][1:v]paletteuse=dither=sierra2_4a:diff_mode=rectangle',
   '-loop', '0', output,
-], { stdio: 'inherit' });
-if (encoded.error) throw encoded.error;
-if (encoded.status !== 0) throw new Error(`ffmpeg exited with status ${encoded.status}`);
+]);
 console.log(`Saved ${output} (${((await stat(output)).size / 1024 / 1024).toFixed(2)} MiB, ${(frameCount / fps).toFixed(2)} s).`);

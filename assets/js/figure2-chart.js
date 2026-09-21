@@ -27,13 +27,16 @@ export class Figure2Chart {
     if ('IntersectionObserver' in window) {
       this.observer = new window.IntersectionObserver((entries) => {
         for (const entry of entries) {
-          const visible = entry.isIntersecting && entry.intersectionRatio >= .18;
+          const visible = entry.isIntersecting;
           entry.target.dataset.visible = String(visible);
           if (visible) this.visible.add(entry.target);
           else this.visible.delete(entry.target);
           if (visible && entry.target.dataset.reveal === 'waiting') entry.target.dataset.reveal = 'playing';
+          // A quick scroll past a panel leaves its results ready for the next visit.
+          else if (!visible && entry.target.dataset.reveal === 'playing') entry.target.dataset.reveal = 'complete';
         }
-      }, { threshold: [0, .18] });
+      // Begin just before a panel enters either edge of a small viewport.
+      }, { threshold: 0, rootMargin: '120px 0px' });
       this.rows.forEach((row) => this.observer.observe(row));
     }
     this.rows.forEach((row) => {

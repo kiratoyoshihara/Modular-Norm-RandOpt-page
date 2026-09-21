@@ -81,12 +81,13 @@ assert.equal(mobilePanels.length, 4, 'Each mobile panel animates independently a
 chart.observer.emit(mobilePanels[0], .5);
 assert.deepEqual(mobilePanels.map(panel => panel.dataset.reveal), ['playing', 'waiting', 'waiting', 'waiting']);
 assert.deepEqual(state(), ['waiting', 'waiting']);
-chart.observer.emit(top, .1);
-assert.deepEqual(state(), ['waiting', 'waiting']);
+chart.observer.emit(top, .01);
+assert.deepEqual(state(), ['playing', 'waiting'], 'A small visible slice starts the reveal without a percentage threshold');
 chart.observer.emit(top, .5);
 assert.deepEqual(state(), ['playing', 'waiting'], 'Lower panels wait until they are visible');
 chart.observer.emit(top, 0);
 assert.equal(top.dataset.visible, 'false');
+assert.equal(top.dataset.reveal, 'complete', 'Scrolling away finishes the reveal instead of freezing invisible points');
 chart.observer.emit(top, .7);
 const done = new window.Event('animationend', { bubbles: true });
 Object.defineProperty(done, 'animationName', { value: 'figure2-sequence' });

@@ -1,4 +1,4 @@
-import { Figure2Chart } from './figure2-chart.js';
+import { Figure2Chart } from './figure2-chart.js?v=chart-reveal-2';
 import { escapeHTML as esc } from './radar-svg.js';
 
 export class IterativeChart {
