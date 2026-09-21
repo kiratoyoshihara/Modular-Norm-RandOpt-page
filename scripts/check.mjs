@@ -87,7 +87,7 @@ for (const compact of [false, true]) {
 }
 const html = await readFile(resolve(root, 'index.html'), 'utf8');
 assert.ok(html.includes(renderLegend(data)));
-for (const file of ['assets/js/main.js', 'assets/js/radar-chart.js', 'assets/js/radar-svg.js', 'assets/js/method-animation.js', 'assets/js/method-svg.js', 'assets/js/motion.js', 'assets/js/research-visuals.js', 'assets/js/research-experience.js']) {
+for (const file of ['assets/js/main.js', 'assets/js/scale-story.js', 'assets/js/scale-timing.js', 'assets/js/scale-diagrams.js', 'assets/js/radar-chart.js', 'assets/js/radar-svg.js', 'assets/js/method-animation.js', 'assets/js/method-svg.js', 'assets/js/motion.js', 'assets/js/research-visuals.js', 'assets/js/research-experience.js']) {
   const result = spawnSync(process.execPath, ['--check', resolve(root, file)], { encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr);
 }

@@ -98,7 +98,7 @@ const source = () => `<g class="method-addition" data-method-stage="1">
   <text x="141" y="96" text-anchor="middle" class="method-math">θ</text>
 </g>`;
 
-const population = () => `<g class="method-population" data-method-stage="2">
+export const renderMethodPopulation = () => `<g class="method-population" data-method-stage="2">
   <text x="60.25" y="-15" text-anchor="middle" class="method-svg-note">N candidates</text>
   ${Array.from({length:METHOD_CANDIDATE_COUNT},(_,index) => {
     const id=index+1, x=index%3*48, y=Math.floor(index/3)*CANDIDATE_ROW_SPACING;
@@ -113,7 +113,7 @@ const population = () => `<g class="method-population" data-method-stage="2">
   <text x="60.25" y="183" text-anchor="middle" class="method-selection-note">Keep K models</text>
 </g>`;
 
-const votes = () => `<g class="method-voting" data-method-stage="4">
+export const renderMethodVotes = () => `<g class="method-voting" data-method-stage="4">
   <text x="83" y="-17" text-anchor="middle" class="method-svg-note">New input</text>
   ${METHOD_SELECTED.map((id,index) => `<g class="method-voter" data-voter="${id}" style="--vote-delay:${voteArrival(index)}ms">
     ${matrixTiles({x:index*VOTER_SPACING,size:5.375,gap:1,seed:id,palette:'combined'})}
@@ -165,19 +165,19 @@ export function renderMethodDiagram(compact = false) {
     <g transform="translate(73 265)">${source()}</g>
     ${captions(160,397,'Modular perturbations',['Module-wise norms + calibrated scales'],1)}
     ${connector(160,444,160,482,2,variant)}
-    <g transform="translate(99.75 519)">${population()}</g>
+    <g transform="translate(99.75 519)">${renderMethodPopulation()}</g>
     ${captions(160,733,'Select top K',['Score the population; keep an ensemble'],3)}
     ${connector(160,781,160,821,4,variant)}
-    <g transform="translate(77.5 859)">${votes()}</g>
+    <g transform="translate(77.5 859)">${renderMethodVotes()}</g>
     ${captions(160,1058,'Vote',['Combine the selected models’ answers'],4)}
   ` : `
     <g transform="translate(42 69)">${rawNoise()}</g>
     ${scaleConnector(127,106,220,106,variant)}
     <g transform="translate(244 69)">${source()}</g>
     ${connector(444,106,543,106,2,variant)}
-    <g transform="translate(570 37.75)">${population()}</g>
+    <g transform="translate(570 37.75)">${renderMethodPopulation()}</g>
     ${connector(715,106,802,106,4,variant)}
-    <g transform="translate(824 42)">${votes()}</g>
+    <g transform="translate(824 42)">${renderMethodVotes()}</g>
     ${captions(76,250,'Sample noise',['Gaussian directions'],0)}
     ${captions(332,250,'Modular perturbations',['Module-wise norms + calibrated scales'],1)}
     ${captions(630,250,'Select top K',['Score N candidates; keep K models'],3)}

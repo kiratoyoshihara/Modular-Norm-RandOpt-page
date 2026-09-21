@@ -2,7 +2,8 @@ import { RadarChart } from './radar-chart.js';
 import { Figure2Chart } from './figure2-chart.js?v=chart-reveal-2';
 import { SectionNav } from './section-nav.js';
 import { IterativeChart } from './iterative-chart.js?v=chart-reveal-2';
-import { MethodAnimation } from './method-animation.js?v=mobile-layout-1';
+import { MethodAnimation } from './method-animation.js?v=scale-controls-2';
+import { ScaleStory } from './scale-story.js?v=allocation-timing-14';
 
 const sectionNav = document.querySelector('.section-nav');
 if (sectionNav) new SectionNav(sectionNav);
@@ -24,6 +25,25 @@ if (method) {
     method.querySelector('.method-playback').hidden = true;
     method.querySelector('.method-step-controls').hidden = true;
     console.error('Using the static method illustration.', error);
+  }
+}
+const scale = document.querySelector('#scale');
+if (scale) {
+  try { new ScaleStory(scale); }
+  catch (error) {
+    scale.classList.remove('is-live', 'has-playback');
+    delete scale.dataset.active;
+    delete scale.dataset.allocation;
+    delete scale.dataset.inView;
+    scale.querySelector('.scale-progress').hidden = true;
+    scale.querySelector('.scale-algorithm-marker').hidden = true;
+    scale.querySelectorAll('.scale-scene').forEach(scene => {
+      scene.removeAttribute('aria-hidden');
+      scene.removeAttribute('inert');
+      scene.dataset.animated = 'false';
+      scene.querySelector('.scale-playback').hidden = true;
+    });
+    console.error('Using the static scale explanation.', error);
   }
 }
 const figure2 = document.querySelector('#figure2');

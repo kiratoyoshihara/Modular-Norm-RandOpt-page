@@ -102,7 +102,7 @@ export class MethodAnimation {
       const id = Number(candidate.dataset.candidate);
       candidate.dataset.candidateState = this.phase >= 3 || id < this.draw ? 'complete' : id === this.draw && this.phase === 2 ? 'current' : 'upcoming';
     });
-    this.steps.forEach((button, index) => button.setAttribute('aria-pressed', String(index === this.phase)));
+    this.steps.forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.methodStep) === this.phase)));
   }
 
   stopTimer() {

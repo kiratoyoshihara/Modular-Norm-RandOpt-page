@@ -75,7 +75,7 @@ for (const reduced of [false, true]) {
     advance(10000);
     assert.equal(animation.phase,0);
     assert.equal(animation.toggle.disabled,true);
-    animation.steps[3].click();
+    figure.querySelector('[data-method-step="3"]').click();
     assert.equal(animation.phase,3,'Reduced-motion users can inspect any step');
     assert.equal(figure.dataset.animate,'false');
   } else {
@@ -149,10 +149,10 @@ for (const reduced of [false, true]) {
     assert.deepEqual(fills('.method-source'),firstPattern,'Replay restores the first draw’s colors');
     assert.equal(diagram.querySelectorAll('[data-candidate-state="upcoming"]').length,9,'Replay clears the entire population');
     assert.equal(animation.complete,false);
-    animation.steps[3].click();
+    figure.querySelector('[data-method-step="3"]').click();
     advance(10000);
     assert.equal(animation.phase,3,'Manual selection stays on the requested step');
-    assert.equal(animation.steps[3].getAttribute('aria-pressed'),'true');
+    assert.equal(figure.querySelector('[data-method-step="3"]').getAttribute('aria-pressed'),'true');
     assert.match(figure.querySelector('[data-method-announcement]').textContent,/Select the top K/);
     animation.toggle.click();
     assert.equal(figure.dataset.animate,'true');
