@@ -81,6 +81,10 @@
 .allocation-tree { display: block; width: 100%; max-width: none; height: auto; max-height: 320px; overflow: visible; transition: width .35s ease, margin-left .35s ease, max-height .35s ease; }
 .scale-scene:not([data-phase='5']) .allocation-tree { width: 120%; max-height: 384px; margin-left: -5%; }
 .scale-scene[data-phase='5'] .allocation-tree { max-height: clamp(150px, calc(100svh - 560px), 190px); }
+.allocation-block { fill-opacity: .26; stroke-opacity: .7; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.allocation-root-block { fill-opacity: .12; stroke-opacity: .4; }
+.allocation-layer { fill-opacity: .12; stroke-opacity: .32; stroke-width: .75; }
+.allocation-layer.is-selected { fill-opacity: .48; stroke-opacity: .95; stroke-width: 1.25; }
 .allocation-tree text { fill: #6a7885; font-size: 14px; }
 .allocation-tree .allocation-root-label { fill: #576978; font-size: 15px; }
 .allocation-tree .allocation-mass { font-size: 13px; fill: #919aa3; }
@@ -106,20 +110,20 @@
 .allocation-static h5 > span { color: #a3aeb7; font: 8px/1.6 var(--mono); }
 .allocation-static li > p { margin-top: 7px; color: #8a949d; font-size: 11px; line-height: 1.8; }
 .allocation-budget { display: flex; height: 11px; margin-top: 15px; }
+.allocation-budget > span, .allocation-group-list i, .allocation-tensor-list > div > div > span::before { background: color-mix(in srgb, var(--allocation-color) 26%, transparent); border: 1px solid color-mix(in srgb, var(--allocation-color) 70%, transparent); border-radius: 2px; }
 .allocation-group-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px 24px; margin-top: 14px; }
 .allocation-group-list > div > span { display: flex; justify-content: space-between; color: #83909a; font-size: 10px; }
 .allocation-group-list b { color: #9ca5ad; font-weight: 400; }
-.allocation-group-list i { display: block; height: 5px; margin-top: 6px; border-radius: 1px; }
+.allocation-group-list i { display: block; height: 7px; margin-top: 6px; }
 .allocation-layer-list, .allocation-tensor-list { display: grid; gap: 15px; margin-top: 14px; }
 .allocation-layer-list span, .allocation-tensor-list > div > span { color: #929aa3; font-size: 10px; }
 .allocation-layer-list > div > div { display: grid; grid-template-columns: repeat(28, minmax(0, 1fr)); gap: 2px; margin-top: 7px; }
-.allocation-layer-list i { height: 13px; background: #947ab8; opacity: .22; border-radius: 1px; }
-.allocation-layer-list > div:nth-child(2) i { background: #cf926c; }
-.allocation-layer-list i.selected { opacity: 1; }
+.allocation-layer-list i { height: 13px; background: color-mix(in srgb, var(--allocation-color) 12%, transparent); border: 1px solid color-mix(in srgb, var(--allocation-color) 32%, transparent); border-radius: 2px; }
+.allocation-layer-list i.selected { background: color-mix(in srgb, var(--allocation-color) 48%, transparent); border-color: var(--allocation-color); }
 .allocation-layer-list small { display: block; color: #a0a8af; font-size: 9px; margin-top: 5px; }
 .allocation-tensor-list > div > div { display: flex; gap: 4px; margin-top: 7px; }
-.allocation-tensor-list > div > div > span { flex: 1; text-align: center; color: #8c76a8; border-top: 5px solid #b9a5d0; padding-top: 5px; font-size: 10px; }
-.allocation-tensor-list > div:nth-child(2) > div > span { color: #b27e5e; border-color: #dfb496; }
+.allocation-tensor-list > div > div > span { flex: 1; text-align: center; color: var(--allocation-color); font-size: 10px; }
+.allocation-tensor-list > div > div > span::before { content: ''; display: block; height: 7px; margin-bottom: 5px; }
 
 /* Scene entry starts these timelines; Pause freezes both the CSS and JS clocks. */
 .scale-scene[data-running='false'] * { animation-play-state: paused !important; }

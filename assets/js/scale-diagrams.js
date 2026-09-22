@@ -4,12 +4,12 @@ import { NORM_ROW_INTERVAL, VOTE_START, SCALE_TRANSFORM_TIMING, SCALE_TIMELINES,
 // Appendix A.3, Table A2 and Eq. (20). These are architectural weights,
 // not measured sensitivities, parameter counts, or final perturbation sizes.
 export const MASS_GROUPS = [
-  { label: 'Embedding', mass: 1, value: '1', color: '#6c98b7' },
-  { label: 'Attention', mass: .5, value: '½', color: '#947ab8' },
-  { label: 'MLP', mass: .5, value: '½', color: '#cf926c' },
-  { label: 'Head', mass: 1, value: '1', color: '#6b9c95' },
-  { label: 'Norm', mass: .1, value: '1/10', color: '#99aabe' },
-  { label: 'Other', mass: .1, value: '1/10', color: '#b2b7bc' },
+  { label: 'Embedding', mass: 1, value: '1', color: '#528fbe' },
+  { label: 'Attention', mass: .5, value: '½', color: '#9070c4' },
+  { label: 'MLP', mass: .5, value: '½', color: '#cf8b5d' },
+  { label: 'Head', mass: 1, value: '1', color: '#4d998b' },
+  { label: 'Norm', mass: .1, value: '1/10', color: '#7e94bd' },
+  { label: 'Other', mass: .1, value: '1/10', color: '#939da9' },
 ];
 export const LAYER_COUNT = 28;
 export const SELECTED_LAYER = 12;
@@ -82,10 +82,11 @@ export function voteDiagram() {
 
 function layerCells(x, y, width, color) {
   const pitch = width / LAYER_COUNT;
-  return Array.from({ length: LAYER_COUNT }, (_, i) => `<rect x="${x + i * pitch}" y="${y}" width="${pitch - 1.5}" height="12" rx="1" fill="${color}" opacity="${i === SELECTED_LAYER - 1 ? 1 : .22}"${i === SELECTED_LAYER - 1 ? ` stroke="${color}" stroke-width="1.4"` : ''}/>`).join('');
+  return Array.from({ length: LAYER_COUNT }, (_, i) => `<rect class="allocation-block allocation-layer${i === SELECTED_LAYER - 1 ? ' is-selected' : ''}" x="${x + i * pitch}" y="${y}" width="${pitch - 1.5}" height="12" rx="1.5" fill="${color}" stroke="${color}"/>`).join('');
 }
 
 export function allocationTree() {
+  const [, attention, mlp] = MASS_GROUPS;
   const centers = [42, 137, 232, 327, 422, 517];
   const unit = 80;
   const total = MASS_GROUPS.reduce((sum, group) => sum + group.mass, 0);
@@ -94,14 +95,14 @@ export function allocationTree() {
   const branches = MASS_GROUPS.map((group, i) => {
     const x = offset, width = group.mass * unit;
     offset += width;
-    return `<rect x="${x}" y="27" width="${width}" height="10" fill="${group.color}"/><path class="allocation-edge" d="M${x + width / 2} 39C${x + width / 2} 58 ${centers[i]} 54 ${centers[i]} 72" pathLength="1"/><text x="${centers[i]}" y="88" text-anchor="middle">${group.label}</text><rect x="${centers[i] - width / 2}" y="98" width="${width}" height="7" rx="1" fill="${group.color}"/><text x="${centers[i]}" y="123" text-anchor="middle" class="allocation-mass">${group.value}</text>`;
+    return `<rect class="allocation-block" x="${x}" y="27" width="${width}" height="10" rx="1.5" fill="${group.color}" stroke="${group.color}"/><path class="allocation-edge" d="M${x + width / 2} 39C${x + width / 2} 58 ${centers[i]} 54 ${centers[i]} 72" pathLength="1"/><text x="${centers[i]}" y="88" text-anchor="middle">${group.label}</text><rect class="allocation-block" x="${centers[i] - width / 2}" y="98" width="${width}" height="7" rx="1.5" fill="${group.color}" stroke="${group.color}"/><text x="${centers[i]}" y="123" text-anchor="middle" class="allocation-mass">${group.value}</text>`;
   }).join('');
-  const projections = (xs, labels, color, width) => xs.map((x, i) => `<path class="allocation-edge" d="M${x} 209V221" pathLength="1"/><text x="${x}" y="236" text-anchor="middle">${labels[i]}</text><rect x="${x - width / 2}" y="245" width="${width}" height="7" rx="1" fill="${color}"/>`).join('');
+  const projections = (xs, labels, color, width) => xs.map((x, i) => `<path class="allocation-edge" d="M${x} 209V221" pathLength="1"/><text x="${x}" y="236" text-anchor="middle">${labels[i]}</text><rect class="allocation-block" x="${x - width / 2}" y="245" width="${width}" height="7" rx="1.5" fill="${color}" stroke="${color}"/>`).join('');
   return `<svg class="allocation-tree" viewBox="0 0 560 288" role="img" aria-label="Mass allocation tree: the model branches into the six groups of Table A2. Attention and MLP each split equally over 28 layers. One layer expands to Q, K, V, O and gate, up, down. QKV gets three shares and O one; gate and up get two shares and down one.">
-    <g class="allocation-part" data-tree-phase="1"><text x="280" y="14" text-anchor="middle" class="allocation-root-label">Model · architectural mass</text><rect x="${rootX}" y="27" width="${total * unit}" height="10" rx="1" fill="#ccd9e4"/></g>
+    <g class="allocation-part" data-tree-phase="1"><text x="280" y="14" text-anchor="middle" class="allocation-root-label">Model · architectural mass</text><rect class="allocation-block allocation-root-block" x="${rootX}" y="27" width="${total * unit}" height="10" rx="1.5" fill="#9aafc1" stroke="#9aafc1"/></g>
     <g class="allocation-part" data-tree-phase="2">${branches}</g>
-    <g class="allocation-part" data-tree-phase="3"><path class="allocation-edge" d="M137 127V138M232 127C232 139 417 126 417 138" pathLength="1"/><text x="145" y="153" text-anchor="middle" class="allocation-detail">Attention ÷ 28 layers</text><text x="417" y="153" text-anchor="middle" class="allocation-detail">MLP ÷ 28 layers</text>${layerCells(24, 164, 242, '#947ab8')}${layerCells(296, 164, 242, '#cf926c')}<text x="145" y="193" text-anchor="middle" class="allocation-detail">Layer 12 · mass 1/56</text><text x="417" y="193" text-anchor="middle" class="allocation-detail">Layer 12 · mass 1/56</text></g>
-    <g class="allocation-part" data-tree-phase="4"><path class="allocation-edge" d="M123 178V181M123 199V202M54 209V202H216V209M395 178V181M395 199V202M335 209V202H499V209" pathLength="1"/>${projections([54, 108, 162, 216], ['Q', 'K', 'V', 'O'], '#947ab8', 27)}${projections([335, 417, 499], ['gate', 'up', 'down'], '#cf926c', 36)}<text x="137" y="275" text-anchor="middle" class="allocation-detail">Q + K + V : O = 3 : 1</text><text x="417" y="275" text-anchor="middle" class="allocation-detail">gate + up : down = 2 : 1</text></g>
+    <g class="allocation-part" data-tree-phase="3"><path class="allocation-edge" d="M137 127V138M232 127C232 139 417 126 417 138" pathLength="1"/><text x="145" y="153" text-anchor="middle" class="allocation-detail">Attention ÷ 28 layers</text><text x="417" y="153" text-anchor="middle" class="allocation-detail">MLP ÷ 28 layers</text>${layerCells(24, 164, 242, attention.color)}${layerCells(296, 164, 242, mlp.color)}<text x="145" y="193" text-anchor="middle" class="allocation-detail">Layer 12 · mass 1/56</text><text x="417" y="193" text-anchor="middle" class="allocation-detail">Layer 12 · mass 1/56</text></g>
+    <g class="allocation-part" data-tree-phase="4"><path class="allocation-edge" d="M123 178V181M123 199V202M54 209V202H216V209M395 178V181M395 199V202M335 209V202H499V209" pathLength="1"/>${projections([54, 108, 162, 216], ['Q', 'K', 'V', 'O'], attention.color, 27)}${projections([335, 417, 499], ['gate', 'up', 'down'], mlp.color, 36)}<text x="137" y="275" text-anchor="middle" class="allocation-detail">Q + K + V : O = 3 : 1</text><text x="417" y="275" text-anchor="middle" class="allocation-detail">gate + up : down = 2 : 1</text></g>
   </svg>`;
 }
 
@@ -125,10 +126,10 @@ const allocationPhases = math => [
 ];
 
 function staticAllocationVisual(index, math) {
-  if (index === 0) return `<div class="allocation-budget" aria-label="Model mass is the sum of active tensor masses">${MASS_GROUPS.map(group => `<span style="flex:${group.mass};background:${group.color}"></span>`).join('')}</div>`;
-  if (index === 1) return `<div class="allocation-group-list">${MASS_GROUPS.map(group => `<div><span>${group.label}<b>${group.value}</b></span><i style="width:${group.mass * 100}%;background:${group.color}"></i></div>`).join('')}</div>`;
-  if (index === 2) return `<div class="allocation-layer-list">${['Attention', 'MLP'].map(label => `<div><span>${label} · 28 equal shares</span><div>${Array.from({ length: LAYER_COUNT }, (_, i) => `<i${i === SELECTED_LAYER - 1 ? ' class="selected"' : ''}></i>`).join('')}</div><small>Layer 12 highlighted · mass 1/56</small></div>`).join('')}</div>`;
-  if (index === 3) return `<div class="allocation-tensor-list"><div><span>Attention · QKV : O = 3 : 1</span><div>${['Q', 'K', 'V', 'O'].map(label => `<span>${label}</span>`).join('')}</div></div><div><span>MLP · gate/up : down = 2 : 1</span><div>${['gate', 'up', 'down'].map(label => `<span>${label}</span>`).join('')}</div></div></div>`;
+  if (index === 0) return `<div class="allocation-budget" aria-label="Model mass is the sum of active tensor masses">${MASS_GROUPS.map(group => `<span style="flex:${group.mass};--allocation-color:${group.color}"></span>`).join('')}</div>`;
+  if (index === 1) return `<div class="allocation-group-list">${MASS_GROUPS.map(group => `<div style="--allocation-color:${group.color}"><span>${group.label}<b>${group.value}</b></span><i style="width:${group.mass * 100}%"></i></div>`).join('')}</div>`;
+  if (index === 2) return `<div class="allocation-layer-list">${MASS_GROUPS.slice(1, 3).map(group => `<div style="--allocation-color:${group.color}"><span>${group.label} · 28 equal shares</span><div>${Array.from({ length: LAYER_COUNT }, (_, i) => `<i${i === SELECTED_LAYER - 1 ? ' class="selected"' : ''}></i>`).join('')}</div><small>Layer 12 highlighted · mass 1/56</small></div>`).join('')}</div>`;
+  if (index === 3) return `<div class="allocation-tensor-list"><div style="--allocation-color:${MASS_GROUPS[1].color}"><span>Attention · QKV : O = 3 : 1</span><div>${['Q', 'K', 'V', 'O'].map(label => `<span>${label}</span>`).join('')}</div></div><div style="--allocation-color:${MASS_GROUPS[2].color}"><span>MLP · gate/up : down = 2 : 1</span><div>${['gate', 'up', 'down'].map(label => `<span>${label}</span>`).join('')}</div></div></div>`;
   return allocationCalculation(math);
 }
 
