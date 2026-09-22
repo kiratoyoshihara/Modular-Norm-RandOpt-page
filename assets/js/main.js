@@ -1,7 +1,7 @@
 import { RadarChart } from './radar-chart.js';
 import { Figure2Chart } from './figure2-chart.js?v=chart-reveal-3';
 import { SectionNav } from './section-nav.js';
-import { IterativeChart } from './iterative-chart.js?v=chart-reveal-3';
+import { IterativeChart } from './iterative-chart.js?v=evaluation-axis-1';
 import { MethodAnimation } from './method-animation.js?v=scale-controls-2';
 import { ScaleStory } from './scale-story.js?v=allocation-timing-14';
 

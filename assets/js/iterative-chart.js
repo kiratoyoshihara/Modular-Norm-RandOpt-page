@@ -52,7 +52,7 @@ export class IterativeChart {
     this.root.querySelectorAll('[data-iterative-series]').forEach((series) => {
       const dimmed = method && series.dataset.iterativeSeries !== method;
       series.style.opacity = dimmed ? '.18' : '1';
-      // A pinned method remains selectable where measurements overlap at N=3000.
+      // A pinned method remains selectable where evaluation budgets overlap.
       series.style.pointerEvents = dimmed ? 'none' : '';
     });
   }
@@ -61,7 +61,8 @@ export class IterativeChart {
     this.motion.finishAll();
     this.hide();
     const d = point.dataset;
-    this.tooltip.innerHTML = `<strong style="color:${point.style.getPropertyValue('--method-color')}">${esc(d.label)}</strong><span>${esc(d.task)} · N=${Number(d.n).toLocaleString('en-US')} · K=${Number(d.k)}</span><dl><div><dt>Accuracy</dt><dd>${Number(d.mean).toFixed(2)} ± ${Number(d.sd).toFixed(2)}%</dd></div></dl><small>Mean ± sample SD · 3 seeds</small>`;
+    const count = value => Number(value).toLocaleString('en-US');
+    this.tooltip.innerHTML = `<strong style="color:${point.style.getPropertyValue('--method-color')}">${esc(d.label)}</strong><span>${esc(d.task)} · N=${count(d.n)} · K=${Number(d.k)}</span><dl><div><dt>Accuracy</dt><dd>${Number(d.mean).toFixed(2)} ± ${Number(d.sd).toFixed(2)}%</dd></div><div><dt>Total evaluations</dt><dd>${count(d.evaluations)}</dd></div><div><dt>Search / training</dt><dd>${count(d.searchEvaluations)}</dd></div><div><dt>Checkpoint selection</dt><dd>${count(d.checkpointEvaluations)}</dd></div><div><dt>Final evaluation</dt><dd>${count(d.testEvaluations)}</dd></div></dl><small>Mean ± sample SD · 3 seeds</small>`;
     this.tooltip.hidden = false;
     point.setAttribute('aria-describedby','iterative-tooltip');
     const bounds = this.root.getBoundingClientRect();

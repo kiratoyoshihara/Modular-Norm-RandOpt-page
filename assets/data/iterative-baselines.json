@@ -7,7 +7,16 @@
   ],
   "source": {
     "primary": "User-supplied comparison results, 2026-09-21",
-    "previous": "Table 3(a), tab:iterative-es; Table D2, tab:es_full_endpoints"
+    "previous": "Table 3(a), tab:iterative-es; Table D2, tab:es_full_endpoints",
+    "evaluations": "Appendix D.2, Eqs. (37)-(39): main-run search, checkpoint selection, and final evaluation; auxiliary costs reported separately"
+  },
+  "evaluationProtocol": {
+    "searchPrompts": 200,
+    "checkpointSelection": {
+      "prompts": 500,
+      "checkpoints": 16,
+      "methods": ["zo", "mezo"]
+    }
   },
   "methods": [
     {

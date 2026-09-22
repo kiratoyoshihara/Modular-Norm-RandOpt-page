@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { iterativeComparison, iterativeX, renderIterativePanel } from '../assets/js/iterative-svg.js';
+import { iterativeComparison, iterativeEvaluationBudget, iterativeX, renderIterativePanel } from '../assets/js/iterative-svg.js';
 import { IterativeChart } from '../assets/js/iterative-chart.js';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
@@ -30,18 +30,25 @@ const expectedResults = {
   ],
 };
 const sortRows = rows => rows.map(row => JSON.stringify(row)).sort();
+// Appendix D.2 main-run totals include K test predictions per prompt and,
+// for MeZO/ZO-Finetuner, 8,000 development model–prompt evaluations.
+const expectedEvaluations = {
+  countdown: { mn100: 57500, mn3000: 637500, es: 601500, zo: 609500, mezo: 609500, randopt3000: 637500, mn_single: 601500 },
+  gsm8k: { mn100: 52975, mn3000: 632975, es: 601319, zo: 609319, mezo: 609319, randopt3000: 632975, mn_single: 601319 },
+};
 for (const task of data.tasks) {
   assert.deepEqual(sortRows(task.points.map(p => [p.method,p.n,p.k,p.mean,p.sd])), sortRows(expectedResults[task.id]));
   for (const p of task.points) {
     assert.ok(p.mean>=task.domain[0] && p.mean<=task.domain[1], 'Every mean fits the accuracy axis');
+    assert.equal(iterativeEvaluationBudget(data,task,p).total,expectedEvaluations[task.id][p.id], 'Evaluation totals match the paper accounting');
   }
-  const comparison = iterativeComparison(task);
-  assert.equal(comparison.ratio, 30);
+  const comparison = iterativeComparison(data,task);
+  assert.equal(comparison.ratio.toFixed(2), task.id === 'countdown' ? '10.46' : '11.35');
   assert.equal(comparison.difference.toFixed(2), task.id === 'countdown' ? '2.73' : '0.05');
   assert.equal(await readFile(resolve(root,`assets/figures/iterative-${task.id}.svg`),'utf8'),renderIterativePanel(data,task,{interactive:false}));
 }
 assert.equal(iterativeX(0),0);
-assert.ok(Math.abs(iterativeX(3000)-30*iterativeX(100))<1e-9,'N uses a linear scale');
+assert.ok(Math.abs(iterativeX(600000)-3*iterativeX(200000))<1e-9,'Evaluation counts use a linear scale');
 const missing = structuredClone(data.tasks[0]);
 missing.points.find(p => p.method === 'mezo').mean = null;
 assert.ok(!renderIterativePanel(data,missing).includes('data-iterative-point="countdown-mezo"'), 'Missing scores remain omitted');
@@ -79,6 +86,11 @@ assert.deepEqual([...document.querySelectorAll('main > .section')].map(section=>
 assert.deepEqual([...document.querySelectorAll('.section-nav a')].map(link=>link.hash),['#overview','#scale','#population-scaling','#results','#iterative-baselines']);
 for (const marker of figure.querySelectorAll('.iterative-point')) {
   assert.equal(marker.closest('[clip-path]'),null,'Points are not clipped during their reveal');
+  const task = data.tasks.find(task => task.label === marker.dataset.task);
+  const p = task.points.find(p => `${task.id}-${p.id}` === marker.dataset.iterativePoint);
+  const expected = expectedEvaluations[task.id][p.id];
+  assert.equal(Number(marker.dataset.evaluations),expected);
+  assert.ok(Math.abs(Number(marker.querySelector('.iterative-hit').getAttribute('cx'))-iterativeX(expected))<.0001, 'Points are positioned by evaluations rather than N');
 }
 chart.motion.observer.emit(chart.motion.rows[0]);
 assert.equal(chart.motion.rows[0].dataset.reveal,'playing');
@@ -87,11 +99,14 @@ point('countdown-mn100').focus();
 assert.equal(tooltip.hidden,false);
 assert.match(tooltip.textContent,/38\.40 ± 2\.71%/);
 assert.match(tooltip.textContent,/N=100 · K=25/);
+assert.match(tooltip.textContent,/Total evaluations57,500/);
+assert.match(tooltip.textContent,/Final evaluation37,500/);
 assert.equal(point('countdown-mn100').getAttribute('aria-describedby'),'iterative-tooltip');
 assert.equal(figure.querySelector('[data-iterative-series="es"]').style.opacity,'0.18');
 point('gsm8k-es').dispatchEvent(new window.MouseEvent('click',{bubbles:true}));
 assert.match(tooltip.textContent,/73\.11 ± 0\.52%/);
 assert.match(tooltip.textContent,/N=3,000 · K=1/);
+assert.match(tooltip.textContent,/Total evaluations601,319/);
 point('gsm8k-mn3000').dispatchEvent(new window.MouseEvent('pointerover',{bubbles:true,clientX:300,clientY:100}));
 assert.match(tooltip.textContent,/74\.45 ± 0\.95%/);
 assert.match(tooltip.textContent,/N=3,000 · K=25/);
@@ -100,6 +115,8 @@ assert.match(tooltip.textContent,/64\.42 ± 0\.29%/);
 assert.match(tooltip.textContent,/N=3,000 · K=1/);
 point('countdown-mezo').focus();
 assert.match(tooltip.textContent,/29\.22 ± 1\.93%/);
+assert.match(tooltip.textContent,/Total evaluations609,500/);
+assert.match(tooltip.textContent,/Checkpoint selection8,000/);
 point('gsm8k-randopt3000').focus();
 assert.match(tooltip.textContent,/69\.95 ± 1\.11%/);
 document.body.dispatchEvent(new window.MouseEvent('pointerdown',{bubbles:true}));
@@ -119,4 +136,4 @@ document.dispatchEvent(new window.CustomEvent('research-motion-change',{detail:{
 assert.ok(chart.motion.rows.every(row=>row.dataset.reveal==='complete'));
 chart.destroy();
 dom.window.close();
-console.log('Passed: 14 selected results, linear N axis, mean differences, missing-value handling, section order, no connecting lines or SD bars, static SVGs, point reveal, tooltip, legend, keyboard/tap, replay, and pause.');
+console.log('Passed: 14 selected results, paper evaluation budgets, linear evaluation axis, reduction ratios, missing-value handling, section order, no connecting lines or SD bars, static SVGs, point reveal, tooltip, legend, keyboard/tap, replay, and pause.');

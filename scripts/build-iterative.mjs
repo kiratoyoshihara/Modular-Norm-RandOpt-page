@@ -13,9 +13,9 @@ const fragment = `<section class="section iterative-section" id="iterative-basel
     <div class="iterative-legend" aria-label="Methods">${iterativeLegend(data)}</div>
     <div class="figure2-toolbar"><button class="figure2-replay" type="button" data-figure2-replay aria-label="Replay the iterative baseline comparison" hidden>↺ Replay</button></div>
     <div class="iterative-grid">${data.tasks.map((task)=>`<div class="iterative-panel"><h3>${task.label}</h3><p>${task.testExamples.toLocaleString('en-US')} test examples</p>${renderIterativePanel(data,task)}</div>`).join('')}</div>
-    <p class="iterative-axis-label">Number of candidates / perturbations, N</p>
+    <p class="iterative-axis-label">Total model–prompt evaluations</p>
     <div class="iterative-tooltip" id="iterative-tooltip" role="tooltip" hidden></div>
-    <figcaption>Points show mean accuracy over 3 seeds. Iterative baselines use K=1.<br>N counts sampled candidates for RandOpt methods and perturbations for iterative baselines.${missing.length ? ` ${missing.join(', ')} accuracy is not reported.` : ''}</figcaption>
+    <figcaption>One evaluation is one model generating and scoring one prompt. Totals include search, checkpoint selection, and final evaluation (Appendix D.2).<br>Points show mean accuracy over 3 seeds. Iterative baselines use K=1.${missing.length ? ` ${missing.join(', ')} accuracy is not reported.` : ''}</figcaption>
   </figure>
 </section>`;
 const htmlPath=resolve(root,'index.html');
@@ -23,4 +23,4 @@ const html=await readFile(htmlPath,'utf8');
 const pattern=/<!-- iterative-section:start -->[\s\S]*?<!-- iterative-section:end -->/;
 if(!pattern.test(html)) throw new Error('Missing iterative comparison section markers');
 await writeFile(htmlPath,html.replace(pattern,`<!-- iterative-section:start -->\n${fragment}\n<!-- iterative-section:end -->`));
-console.log('Rebuilt accuracy versus N from the supplied iterative comparison results.');
+console.log('Rebuilt accuracy versus total model–prompt evaluations using Appendix D.2.');
