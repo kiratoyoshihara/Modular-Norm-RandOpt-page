@@ -1,6 +1,6 @@
 // Export the existing method illustration with its original CSS animation timing.
 // Requires ffmpeg and Playwright (project-local or in .local/verification).
-// Run: node scripts/export-method-gif.mjs [output.gif] [pixel-scale]
+// Run: node scripts/export-method-gif.mjs [output.gif] [pixel-scale] [fps]
 import { createServer } from 'node:http';
 import { mkdir, readFile, stat } from 'node:fs/promises';
 import { createRequire } from 'node:module';
@@ -19,8 +19,9 @@ try {
 const output = resolve(root, process.argv[2] || 'assets/animations/modular-norm-randopt.gif');
 const pixelScale = Number(process.argv[3] || 1);
 if (!Number.isInteger(pixelScale) || pixelScale < 1) throw new Error('Pixel scale must be a positive integer.');
-const frames = resolve(root, `.local/method-gif-frames-${pixelScale}x`);
-const fps = 20;
+const fps = Number(process.argv[4] || 20);
+if (!Number.isInteger(fps) || fps < 1 || fps > 100) throw new Error('Frame rate must be an integer from 1 to 100.');
+const frames = resolve(root, `.local/method-gif-frames-${pixelScale}x-${fps}fps`);
 const width = 1440;
 const hold = 1600;
 const duration = METHOD_DURATIONS.reduce((sum, value) => sum + value, 0);
